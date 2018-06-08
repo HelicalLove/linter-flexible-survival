@@ -27,6 +27,7 @@ const BRITISH_TO_AMERICAN = {
 	'armour': 'armor',
 	'behaviour': 'behavior',
 	'colour': 'color',
+	'demeanour': 'demeanor',
 	'favour': 'favor',
 	'fervour': 'fervor',
 	'flavour': 'flavor',
