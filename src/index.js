@@ -70,11 +70,10 @@ const BRITISH_TO_AMERICAN = {
 	// miscellaneous differences
   'aluminium': 'aluminum',
 	'anticlockwise': 'counterclockwise',
+	'femmecum': 'femcum',
 	'oesophagus': 'esophagus',
-	'programme': 'program',
 	'storey': 'story',
 	'tonne': 'ton',
-	'femmecum': 'femcum',
 
 };
 
