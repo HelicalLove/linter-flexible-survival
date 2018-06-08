@@ -151,20 +151,26 @@ export function provideLinter() {
 					'LineBreak',
 					'WaitLineBreak',
         ];
-        if (SEMICOLON_END_REQUIRED_STARTS.some(e => line.startsWith(e)) && !(line.endsWith(';') || line.endsWith(']'))) {
-          lints.push({
-            severity: 'error',
-            location: {
-              file: filePath,
-              position: [[lineIndex, rawLine.length-1], [lineIndex, rawLine.length]],
-            },
-            excerpt: `All 'say' commands must end in a semicolon ';'`,
-						solutions: [{
-							position: [[lineIndex, rawLine.length], [lineIndex, rawLine.length]],
-							replaceWith: ';',
-						}],
-          });
-        }
+
+				for (let i = 0; i < SEMICOLON_END_REQUIRED_STARTS.length; i++) {
+					const startCheck = SEMICOLON_END_REQUIRED_STARTS[i];
+
+					if (line.startsWith(startCheck) && !(line.endsWith(';') || line.endsWith(']'))) {
+	          lints.push({
+	            severity: 'error',
+	            location: {
+	              file: filePath,
+	              position: [[lineIndex, rawLine.length-1], [lineIndex, rawLine.length]],
+	            },
+	            excerpt: `All '${startCheck}' commands must end in a semicolon ';'`,
+							solutions: [{
+								position: [[lineIndex, rawLine.length-1], [lineIndex, rawLine.length]],
+								replaceWith: ';',
+							}],
+	          });
+						break;
+	        }
+				}
 
         if (line.startsWith('say "  ')) {
 					const numSpaces = line.substr(5).match(/^\s*/)[0].length;
