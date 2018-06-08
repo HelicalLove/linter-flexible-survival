@@ -226,6 +226,20 @@ export function provideLinter() {
             });
           }
         }
+
+				const impregMatch = rawLine.match(/\[m?impregchance\]/);
+        if (impregMatch !== null) {
+					if (text.match(/setmonster/) === null) {
+						lints.push({
+	            severity: 'info',
+	            location: {
+	              file: filePath,
+	              position: [[lineIndex, impregMatch.index], [lineIndex, impregMatch.index + impregMatch[0].length]],
+	            },
+	            excerpt: `You will probably need 'setmonster' somewhere in this file for impreg to work.`,
+	          });
+					}
+        }
       })
 
       return lints;
