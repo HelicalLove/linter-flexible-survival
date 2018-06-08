@@ -67,5 +67,5 @@ use babel.theoris	.\src\index.js	/^	'theoris': 'theoriz',$/;"	p
 use babel.tonne	.\src\index.js	/^	'tonne': 'ton',$/;"	p
 use babel.travell	.\src\index.js	/^	'travell': 'travel',$/;"	p
 use babel.vigour	.\src\index.js	/^	'vigour': 'vigor',$/;"	p
-version	.\package.json	/^  "version": "3.0.0",$/;"	f
+version	.\package.json	/^  "version": "3.1.0",$/;"	f
 versions	.\package.json	/^      "versions": {$/;"	f
