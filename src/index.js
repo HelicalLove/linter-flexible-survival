@@ -8,6 +8,8 @@ const BRITISH_TO_AMERICAN = {
 	'energis': 'energiz',
 	'organis': 'organiz',
 	'practis': 'practic',
+	'realise': 'realize',
+	'realising': 'realizing',
 	'recognis': 'recogniz',
 	'theoris': 'theoriz',
 
@@ -17,7 +19,8 @@ const BRITISH_TO_AMERICAN = {
 	'travell': 'travel',
 
 	// nc vs ns
-  'defenc': 'defens',
+	'defenc': 'defens',
+	'converc': 'convers',
 
 	// ogue vs og
 	'analogue': 'analog',
