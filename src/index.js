@@ -100,8 +100,8 @@ export function provideLinter() {
       const fullTitle = textEditor.getTitle();
 
       // sanitize lines
-      const rawLines = text.split('\n');
-      const lines = rawLines.slice(0, -1).map(line => line.trimRight());
+      const rawLines = text.split('\r\n');
+      const lines = rawLines.slice(0, -1).map(line => line.replace(/\r$/, ''));
       lines.push(rawLines[rawLines.length - 1])
 
       let lints = [];
@@ -121,7 +121,7 @@ export function provideLinter() {
           excerpt: `Your first line should be '${fileName} by ${folderName} begins here.'`,
 					solutions: [{
 						position: [[0, 0], [0, 0]],
-						apply: () => textEditor.setText(`${fileName} by ${folderName} begins here.\n\n` + text),
+						apply: () => textEditor.setText(`${fileName} by ${folderName} begins here.\r\n\r\n` + text),
 					}],
         });
       }
@@ -136,7 +136,7 @@ export function provideLinter() {
           excerpt: `Your last line should be '${fileName} ends here.'`,
 					solutions: [{
 						position: [[0, 0], [0, 0]],
-						apply: () => textEditor.setText(text + `\n${fileName} ends here.`),
+						apply: () => textEditor.setText(text + `\r\n${fileName} ends here.`),
 					}],
         });
       }
@@ -145,7 +145,6 @@ export function provideLinter() {
         const line = rawLine.trim();
         const lineStartIndex = rawLine.match(/^\s*/)[0].length;
 
-        // TODO: check for comment at end of line
         const SEMICOLON_END_REQUIRED_STARTS = [
           'say "',
           'now',
@@ -240,6 +239,18 @@ export function provideLinter() {
 	            excerpt: `You will probably need 'setmonster' somewhere in this file for impreg to work.`,
 	          });
 					}
+        }
+
+				const whitespaceAtEndOfLine = rawLine.match(/\s*$/);
+        if (whitespaceAtEndOfLine[0].length > 0) {
+					lints.push({
+            severity: 'error',
+            location: {
+              file: filePath,
+              position: [[lineIndex, whitespaceAtEndOfLine.index], [lineIndex, rawLine.length]],
+            },
+            excerpt: `Do not have random extra whitespace.`,
+          });
         }
       })
 
