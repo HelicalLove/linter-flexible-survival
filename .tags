@@ -7,7 +7,7 @@
 2.0.0	.\package.json	/^        "2.0.0": "provideLinter"$/;"	f
 Money	.\test\hahaluckyme\Example.i7x	/^Money is a number that varies.$/;"	f
 atom	.\package.json	/^    "atom": ">=1.4.0 <2.0.0"$/;"	f
-atom-package-deps	.\package.json	/^    "atom-package-deps": "^4.4.1",$/;"	f
+atom-package-deps	.\package.json	/^    "atom-package-deps": "^4.4.1"$/;"	f
 author	.\package.json	/^  "author": "hahaluckyme <brimfoxxo@gmail.com>",$/;"	f
 dependencies	.\package.json	/^  "dependencies": {$/;"	f
 description	.\package.json	/^  "description": "A linter package for the Flexible Survival repository",$/;"	f
