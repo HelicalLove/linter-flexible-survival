@@ -124,18 +124,6 @@ export function provideLinter() {
 					excerpt: `Don't add 'for fs' in your filename. Just use '${proposedFileName}'`,
 				});
 			}
-			lints.push({
-				severity: 'error',
-				location: {
-					file: filePath,
-					position: [[0, 0], [0, lines[0].length+1]],
-				},
-				excerpt: `Your first line should be '${fileName} by ${folderName} begins here.'`,
-				solutions: [{
-					position: [[0, 0], [0, 0]],
-					apply: () => textEditor.setText(`${fileName} by ${folderName} begins here.\r\n\r\n` + text),
-				}],
-			});
 
       const folderHierarchy = filePath.split('\\');
       const folderName = folderHierarchy[folderHierarchy.length-2];
@@ -278,6 +266,26 @@ export function provideLinter() {
               position: [[lineIndex, whitespaceAtEndOfLine.index], [lineIndex, rawLine.length]],
             },
             excerpt: `Do not have random extra whitespace.`,
+						solutions: [{
+							position: [[lineIndex, whitespaceAtEndOfLine.index], [lineIndex, rawLine.length]],
+							replaceWith: '',
+						}],
+          });
+        }
+
+				const doubleSpaceMatch = rawLine.match(/[.?!]  /);
+        if (doubleSpaceMatch !== null) {
+					lints.push({
+            severity: 'warning',
+            location: {
+              file: filePath,
+              position: [[lineIndex, doubleSpaceMatch.index + 1], [lineIndex, doubleSpaceMatch.index + doubleSpaceMatch[0].length]],
+            },
+            excerpt: `Use single spaces after punctuation.`,
+						solutions: [{
+							position: [[lineIndex, doubleSpaceMatch.index + 1], [lineIndex, doubleSpaceMatch.index + doubleSpaceMatch[0].length]],
+							replaceWith: ' ',
+						}],
           });
         }
       })
