@@ -1,10 +1,16 @@
 {
   "name": "linter-flexible-survival",
   "main": "./src/index",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "author": "hahaluckyme <brimfoxxo@gmail.com>",
   "description": "A linter package for the Flexible Survival repository",
-  "keywords": ["linter-flexible-survival", "linter", "flexible", "survival", "flexible survival"],
+  "keywords": [
+    "linter-flexible-survival",
+    "linter",
+    "flexible",
+    "survival",
+    "flexible survival"
+  ],
   "repository": "https://github.com/HelicalLove/linter-flexible-survival.git",
   "engines": {
     "atom": ">=1.4.0 <2.0.0"
