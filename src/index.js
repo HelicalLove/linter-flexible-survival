@@ -230,7 +230,7 @@ export function provideLinter() {
 
 				const impregMatch = rawLine.match(/\[m?impregchance\]/);
         if (impregMatch !== null) {
-					if (text.match(/setmonster/) === null) {
+					if (text.match(/(setmonster|Choose a blank row from Table of random critters)/) === null) {
 						lints.push({
 	            severity: 'info',
 	            location: {
