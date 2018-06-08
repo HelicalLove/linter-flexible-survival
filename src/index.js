@@ -62,7 +62,8 @@ const BRITISH_TO_AMERICAN = {
 	'theatre': 'theater',
 
 	// ys vs yz
-	'analys': 'analyz',
+	'analyse': 'analyze',
+	'analysing': 'analyzing',
 	'catalys': 'catalyz',
 	'hydrolys': 'hydrolyz',
 	'paralys': 'paralyz',
