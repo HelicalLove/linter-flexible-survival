@@ -82,7 +82,7 @@ export function deactivate() {
 
 export function provideLinter() {
   return {
-    name: 'Example',
+    name: 'Linter Flexible Survival',
     scope: 'file',
     lintsOnChange: true,
     grammarScopes: ['source.inform7'],
@@ -122,7 +122,7 @@ export function provideLinter() {
         });
       }
 
-      if (lines[lines.length-2] !== `${fileName} ends here.`) {
+      if (lines[lines.length-2] !== `${fileName} ends here.` && lines[lines.length-1] !== `${fileName} ends here.`) {
         lints.push({
           severity: 'error',
           location: {
