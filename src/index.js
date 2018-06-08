@@ -12,8 +12,9 @@ const BRITISH_TO_AMERICAN = {
 	'theoris': 'theoriz',
 
 	// ll vs l
-	'travell': 'travel',
 	'fuell': 'fuel',
+	'handfull': 'handful',
+	'travell': 'travel',
 
 	// nc vs ns
   'defenc': 'defens',
@@ -37,6 +38,7 @@ const BRITISH_TO_AMERICAN = {
 	'rumour': 'rumor',
 	'savour': 'savor',
 	'splendour': 'splendor',
+	'vapour': 'vapor',
 	'vigour': 'vigor',
 
 	// re vs er
@@ -69,6 +71,7 @@ const BRITISH_TO_AMERICAN = {
 	'anticlockwise': 'counterclockwise',
 	'oesophagus': 'esophagus',
 	'programme': 'program',
+	'storey': 'story',
 	'tonne': 'ton',
 	'femmecum': 'femcum',
 

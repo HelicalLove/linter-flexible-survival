@@ -39,6 +39,7 @@ use babel.fibre	.\src\index.js	/^	'fibre': 'fiber',$/;"	p
 use babel.flavour	.\src\index.js	/^	'flavour': 'flavor',$/;"	p
 use babel.fuell	.\src\index.js	/^	'fuell': 'fuel',$/;"	p
 use babel.goitre	.\src\index.js	/^	'goitre': 'goiter',$/;"	p
+use babel.handfull	.\src\index.js	/^	'handfull': 'handful',$/;"	p
 use babel.harbour	.\src\index.js	/^	'harbour': 'harbor',$/;"	p
 use babel.honour	.\src\index.js	/^	'honour': 'honor',$/;"	p
 use babel.humour	.\src\index.js	/^	'humour': 'humor',$/;"	p
@@ -66,10 +67,12 @@ use babel.sepulchre	.\src\index.js	/^	'sepulchre': 'sepulcher',$/;"	p
 use babel.sombre	.\src\index.js	/^	'sombre': 'somber',$/;"	p
 use babel.spectre	.\src\index.js	/^	'spectre': 'specter',$/;"	p
 use babel.splendour	.\src\index.js	/^	'splendour': 'splendor',$/;"	p
+use babel.storey	.\src\index.js	/^	'storey': 'story',$/;"	p
 use babel.theatre	.\src\index.js	/^	'theatre': 'theater',$/;"	p
 use babel.theoris	.\src\index.js	/^	'theoris': 'theoriz',$/;"	p
 use babel.tonne	.\src\index.js	/^	'tonne': 'ton',$/;"	p
 use babel.travell	.\src\index.js	/^	'travell': 'travel',$/;"	p
+use babel.vapour	.\src\index.js	/^	'vapour': 'vapor',$/;"	p
 use babel.vigour	.\src\index.js	/^	'vigour': 'vigor',$/;"	p
 version	.\package.json	/^  "version": "3.4.2",$/;"	f
 versions	.\package.json	/^      "versions": {$/;"	f
