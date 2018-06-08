@@ -13,6 +13,7 @@ const BRITISH_TO_AMERICAN = {
 
 	// ll vs l
 	'travell': 'travel',
+	'fuell': 'fuel',
 
 	// nc vs ns
   'defenc': 'defens',
@@ -25,6 +26,8 @@ const BRITISH_TO_AMERICAN = {
 	'armour': 'armor',
 	'behaviour': 'behavior',
 	'colour': 'color',
+	'favour': 'favor',
+	'fervour': 'fervor',
 	'flavour': 'flavor',
 	'harbour': 'harbor',
 	'honour': 'honor',
@@ -67,6 +70,7 @@ const BRITISH_TO_AMERICAN = {
 	'oesophagus': 'esophagus',
 	'programme': 'program',
 	'tonne': 'ton',
+	'femmecum': 'femcum',
 
 };
 
