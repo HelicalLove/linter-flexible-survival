@@ -106,13 +106,37 @@ export function provideLinter() {
       }
 
       // sanitize lines
-      const rawLines = text.split('\r\n');
+      const rawLines = text.split('\n');
       const lines = rawLines.slice(0, -1).map(line => line.replace(/\r$/, ''));
       lines.push(rawLines[rawLines.length - 1])
 
       let lints = [];
 
       const fileName = fullTitle.substr(0, fullTitle.indexOf('.'));
+			if (fileName.toLowerCase().endsWith(' for fs')) {
+				const proposedFileName = fileName.substr(0, fileName.length - 7);
+				lints.push({
+					severity: 'error',
+					location: {
+						file: filePath,
+						position: [[0, 0], [0, lines[0].length+1]],
+					},
+					excerpt: `Don't add 'for fs' in your filename. Just use '${proposedFileName}'`,
+				});
+			}
+			lints.push({
+				severity: 'error',
+				location: {
+					file: filePath,
+					position: [[0, 0], [0, lines[0].length+1]],
+				},
+				excerpt: `Your first line should be '${fileName} by ${folderName} begins here.'`,
+				solutions: [{
+					position: [[0, 0], [0, 0]],
+					apply: () => textEditor.setText(`${fileName} by ${folderName} begins here.\r\n\r\n` + text),
+				}],
+			});
+
       const folderHierarchy = filePath.split('\\');
       const folderName = folderHierarchy[folderHierarchy.length-2];
       if (!(lines[0].includes(fileName) && lines[0].includes(folderName) && lines[0].endsWith('begins here.'))) {
@@ -130,7 +154,7 @@ export function provideLinter() {
         });
       }
 
-      if (lines[lines.length-2] !== `${fileName} ends here.` && lines[lines.length-1] !== `${fileName} ends here.`) {
+			if (lines.length > 2 && lines[lines.length-2] !== `${fileName} ends here.` && lines[lines.length-1] !== `${fileName} ends here.`) {
         lints.push({
           severity: 'error',
           location: {
