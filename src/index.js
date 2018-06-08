@@ -103,10 +103,7 @@ export function provideLinter() {
         : fullTitle.substr(0, fullTitle.indexOf('.'))
       const folderHierarchy = filePath.split('\\');
       const folderName = folderHierarchy[folderHierarchy.length-2];
-			console.log(fileName);
-			console.log(folderName);
-			console.log(lines);
-      if (lines[0] !== `${fileName} by ${folderName} begins here.`) {
+      if (!lines[0].endsWith(`${fileName} by ${folderName} begins here.`)) {
         lints.push({
           severity: 'error',
           location: {

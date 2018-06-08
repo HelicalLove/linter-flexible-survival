@@ -1,0 +1,71 @@
+!_TAG_FILE_FORMAT	2	/extended format; --format=1 will not append ;" to lines/
+!_TAG_FILE_SORTED	1	/0=unsorted, 1=sorted, 2=foldcase/
+!_TAG_PROGRAM_AUTHOR	Darren Hiebert	/dhiebert@users.sourceforge.net/
+!_TAG_PROGRAM_NAME	Exuberant Ctags	//
+!_TAG_PROGRAM_URL	http://ctags.sourceforge.net	/official site/
+!_TAG_PROGRAM_VERSION	5.8	//
+2.0.0	.\package.json	/^        "2.0.0": "provideLinter"$/;"	f
+Money	.\test\hahaluckyme\Example.i7x	/^Money is a number that varies.$/;"	f
+atom	.\package.json	/^    "atom": ">=1.4.0 <2.0.0"$/;"	f
+author	.\package.json	/^  "author": "hahaluckyme <brimfoxxo@gmail.com>",$/;"	f
+description	.\package.json	/^  "description": "A linter package for the Flexible Survival repository",$/;"	f
+engines	.\package.json	/^  "engines": {$/;"	f
+keywords	.\package.json	/^  "keywords": [$/;"	f
+linter	.\package.json	/^    "linter": {$/;"	f
+main	.\package.json	/^  "main": ".\/src\/index",$/;"	f
+name	.\package.json	/^  "name": "linter-flexible-survival",$/;"	f
+package-deps	.\package.json	/^  "package-deps": [$/;"	f
+providedServices	.\package.json	/^  "providedServices": {$/;"	f
+repository	.\package.json	/^  "repository": "https:\/\/github.com\/HelicalLove\/linter-flexible-survival.git",$/;"	f
+use babel.aluminium	.\src\index.js	/^  'aluminium': 'aluminum',$/;"	p
+use babel.analogue	.\src\index.js	/^	'analogue': 'analog',$/;"	p
+use babel.analys	.\src\index.js	/^	'analys': 'analyz',$/;"	p
+use babel.anticlockwise	.\src\index.js	/^	'anticlockwise': 'counterclockwise',$/;"	p
+use babel.apologis	.\src\index.js	/^	'apologis': 'apologiz',$/;"	p
+use babel.armour	.\src\index.js	/^	'armour': 'armor',$/;"	p
+use babel.behaviour	.\src\index.js	/^	'behaviour': 'behavior',$/;"	p
+use babel.calibre	.\src\index.js	/^	'calibre': 'caliber',$/;"	p
+use babel.catalogue	.\src\index.js	/^	'catalogue': 'catalog',$/;"	p
+use babel.catalys	.\src\index.js	/^	'catalys': 'catalyz',$/;"	p
+use babel.centre	.\src\index.js	/^	'centre': 'center',$/;"	p
+use babel.colour	.\src\index.js	/^	'colour': 'color',$/;"	p
+use babel.colouris	.\src\index.js	/^	'colouris': 'coloriz',$/;"	p
+use babel.defenc	.\src\index.js	/^  'defenc': 'defens',$/;"	p
+use babel.energis	.\src\index.js	/^	'energis': 'energiz',$/;"	p
+use babel.fibre	.\src\index.js	/^	'fibre': 'fiber',$/;"	p
+use babel.flavour	.\src\index.js	/^	'flavour': 'flavor',$/;"	p
+use babel.goitre	.\src\index.js	/^	'goitre': 'goiter',$/;"	p
+use babel.harbour	.\src\index.js	/^	'harbour': 'harbor',$/;"	p
+use babel.honour	.\src\index.js	/^	'honour': 'honor',$/;"	p
+use babel.humour	.\src\index.js	/^	'humour': 'humor',$/;"	p
+use babel.hydrolys	.\src\index.js	/^	'hydrolys': 'hydrolyz',$/;"	p
+use babel.labour	.\src\index.js	/^	'labour': 'labor',$/;"	p
+use babel.litre	.\src\index.js	/^	'litre': 'liter',$/;"	p
+use babel.lustre	.\src\index.js	/^	'lustre': 'luster',$/;"	p
+use babel.maneuvre	.\src\index.js	/^	'maneuvre': 'maneuver',$/;"	p
+use babel.manoeuvre	.\src\index.js	/^	'manoeuvre': 'maneuver',$/;"	p
+use babel.meagre	.\src\index.js	/^	'meagre': 'meager',$/;"	p
+use babel.metre	.\src\index.js	/^	'metre': 'meter',$/;"	p
+use babel.mitre	.\src\index.js	/^	'mitre': 'miter',$/;"	p
+use babel.neighbour	.\src\index.js	/^	'neighbour': 'neighbor',$/;"	p
+use babel.nitre	.\src\index.js	/^	'nitre': 'niter',$/;"	p
+use babel.oesophagus	.\src\index.js	/^	'oesophagus': 'esophagus',$/;"	p
+use babel.organis	.\src\index.js	/^	'organis': 'organiz',$/;"	p
+use babel.paralys	.\src\index.js	/^	'paralys': 'paralyz',$/;"	p
+use babel.practis	.\src\index.js	/^	'practis': 'practic',$/;"	p
+use babel.programme	.\src\index.js	/^	'programme': 'program',$/;"	p
+use babel.recognis	.\src\index.js	/^	'recognis': 'recogniz',$/;"	p
+use babel.rumour	.\src\index.js	/^	'rumour': 'rumor',$/;"	p
+use babel.saltpetre	.\src\index.js	/^	'saltpetre': 'saltpeter',$/;"	p
+use babel.savour	.\src\index.js	/^	'savour': 'savor',$/;"	p
+use babel.sepulchre	.\src\index.js	/^	'sepulchre': 'sepulcher',$/;"	p
+use babel.sombre	.\src\index.js	/^	'sombre': 'somber',$/;"	p
+use babel.spectre	.\src\index.js	/^	'spectre': 'specter',$/;"	p
+use babel.splendour	.\src\index.js	/^	'splendour': 'splendor',$/;"	p
+use babel.theatre	.\src\index.js	/^	'theatre': 'theater',$/;"	p
+use babel.theoris	.\src\index.js	/^	'theoris': 'theoriz',$/;"	p
+use babel.tonne	.\src\index.js	/^	'tonne': 'ton',$/;"	p
+use babel.travell	.\src\index.js	/^	'travell': 'travel',$/;"	p
+use babel.vigour	.\src\index.js	/^	'vigour': 'vigor',$/;"	p
+version	.\package.json	/^  "version": "3.0.0",$/;"	f
+versions	.\package.json	/^      "versions": {$/;"	f
