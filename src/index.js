@@ -91,13 +91,16 @@ export function provideLinter() {
     lintsOnChange: true,
     grammarScopes: ['source.inform7'],
     lint(textEditor) {
+			const fullTitle = textEditor.getTitle();
+			if (!fullTitle.includes('.i7x')) {
+				return [];
+			}
+
       const filePath = textEditor.getPath();
       const text = textEditor.getText();
       if (!filePath || text.length === 0) {
         return [];
       }
-
-      const fullTitle = textEditor.getTitle();
 
       // sanitize lines
       const rawLines = text.split('\r\n');
@@ -106,9 +109,7 @@ export function provideLinter() {
 
       let lints = [];
 
-      const fileName = fullTitle.indexOf('.') === -1
-        ? fullTitle
-        : fullTitle.substr(0, fullTitle.indexOf('.'))
+      const fileName = fullTitle.substr(0, fullTitle.indexOf('.'));
       const folderHierarchy = filePath.split('\\');
       const folderName = folderHierarchy[folderHierarchy.length-2];
       if (!(lines[0].includes(fileName) && lines[0].includes(folderName) && lines[0].endsWith('begins here.'))) {
