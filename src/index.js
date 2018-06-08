@@ -75,6 +75,10 @@ const BRITISH_TO_AMERICAN = {
 };
 
 export function activate() {
+	require('atom-package-deps').install('linter-flexible-survival')
+		.then(function() {
+			console.log('All dependencies installed, good to go')
+		})
 }
 
 export function deactivate() {

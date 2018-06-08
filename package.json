@@ -15,6 +15,9 @@
   "engines": {
     "atom": ">=1.4.0 <2.0.0"
   },
+  "dependencies": {
+    "atom-package-deps": "^4.4.1",
+  },
   "package-deps": [
     "linter:2.0.0"
   ],
