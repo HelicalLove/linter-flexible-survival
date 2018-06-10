@@ -71,6 +71,7 @@ const BRITISH_TO_AMERICAN = {
 	'hydrolys': 'hydrolyz',
 	'paralyse': 'paralyze',
 	'paralysing': 'paralyzing',
+	'socialis': 'socializ',
 
 	// miscellaneous differences
   'aluminium': 'aluminum',
