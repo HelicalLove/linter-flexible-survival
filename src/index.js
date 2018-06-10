@@ -231,7 +231,6 @@ export function provideLinter() {
         });
       }
 
-			let lastWaitLineBreakIndex = -2;
       lines.forEach((rawLine, lineIndex) => {
         const line = rawLine.trim();
         const lineStartIndex = rawLine.match(/^\s*/)[0].length;
@@ -559,21 +558,6 @@ export function provideLinter() {
             });
 					}
         }
-
-				const waitLineBreakIndex = rawLine.indexOf('WaitLineBreak;');
-				if (waitLineBreakIndex !== -1) {
-					if (lineIndex - lastWaitLineBreakIndex <= 2) {
-						lints.push({
-							severity: 'warning',
-							location: {
-								file: filePath,
-								position: [[lastWaitLineBreakIndex, waitLineBreakIndex], [lineIndex, waitLineBreakIndex + 14]],
-							},
-							excerpt: `Put more content between waits.`,
-						});
-					}
-					lastWaitLineBreakIndex = lineIndex;
-				}
 
       });
 
