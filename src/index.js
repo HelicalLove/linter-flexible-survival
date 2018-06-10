@@ -69,7 +69,8 @@ const BRITISH_TO_AMERICAN = {
 	'analysing': 'analyzing',
 	'catalys': 'catalyz',
 	'hydrolys': 'hydrolyz',
-	'paralys': 'paralyz',
+	'paralyse': 'paralyze',
+	'paralysing': 'paralyzing',
 
 	// miscellaneous differences
   'aluminium': 'aluminum',
@@ -77,7 +78,6 @@ const BRITISH_TO_AMERICAN = {
 	'femmecum': 'femcum',
 	'oesophagus': 'esophagus',
 	'storey': 'story',
-	'tonne': 'ton',
 
 };
 
