@@ -141,6 +141,7 @@ const NON_INTERESTING_WORDS = [
 	'to',
 	'the',
 	'you',
+	'your',
 ];
 
 function firstInterestingWord(arrayOfWords) {
