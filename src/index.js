@@ -17,6 +17,7 @@ const BRITISH_TO_AMERICAN = {
 	'fuell': 'fuel',
 	'handfull': 'handful',
 	'travell': 'travel',
+	'signall': 'signal',
 
 	// nc vs ns
 	'defenc': 'defens',
@@ -67,7 +68,11 @@ const BRITISH_TO_AMERICAN = {
 	// ys vs yz
 	'analyse': 'analyze',
 	'analysing': 'analyzing',
-	'catalys': 'catalyz',
+	'catalyse': 'catalyze',
+	'catalysing': 'catalyzing',
+	'emphasise': 'emphasize',
+	'emphasising': 'emphasizing',
+	'fantasis': 'fantasiz',
 	'hydrolys': 'hydrolyz',
 	'paralyse': 'paralyze',
 	'paralysing': 'paralyzing',
@@ -86,6 +91,7 @@ const BRITISH_TO_AMERICAN = {
 const FUNCTION_SUBSTITUTIONS = {
 	'if waiterhater is 0, wait for any key;': 'WaitLineBreak;',
 	'if waiterhater is 0 and hypernull is 0, LineBreak;': 'WaitLineBreak;',
+	'attempttowait;': 'WaitLineBreak;',
 };
 
 export function activate() {
@@ -211,7 +217,7 @@ export function provideLinter() {
               file: filePath,
               position: [[lineIndex, stupidQuotesMatch.index], [lineIndex, stupidQuotesMatch.index + 1]],
             },
-            excerpt: `Don't use Smart Quotes! Applications like Word and LibreOffice will not use regular quotes.`,
+            excerpt: `Don't use Smart Quotes! Change the settings in applications like Word and LibreOffice to use regular quotes.`,
 						solutions: [{
 							position: [[lineIndex, stupidQuotesMatch.index], [lineIndex, stupidQuotesMatch.index + 1]],
 							replaceWith: '"',
@@ -316,7 +322,7 @@ export function provideLinter() {
         }
 
 				if (line.indexOf('"') !== -1) {
-					const doubleSpaceMatch = rawLine.match(/[.?!]  /);
+					const doubleSpaceMatch = rawLine.match(/[.?!']  /);
 	        if (doubleSpaceMatch !== null) {
 						lints.push({
 	            severity: 'warning',

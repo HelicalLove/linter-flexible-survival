@@ -22,4 +22,6 @@ say “oopsie woopsie wrong quotes”
   if waiterhater is 0 and hypernull is 0, LineBreak; [adds a break after the 'more']
 
 
+say "     'Do not use two spaces after a period.'  I will murder you.";
+
 say "Poop!"
