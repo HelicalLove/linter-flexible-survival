@@ -1,7 +1,7 @@
 {
   "name": "linter-flexible-survival",
   "main": "./src/index",
-  "version": "3.9.2",
+  "version": "3.9.3",
   "author": "hahaluckyme <brimfoxxo@gmail.com>",
   "description": "A linter package for the Flexible Survival repository",
   "keywords": [
