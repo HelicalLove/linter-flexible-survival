@@ -97,6 +97,17 @@ const FUNCTION_SUBSTITUTIONS = {
 	'if waiterhater is 0 and hypernull is 0, LineBreak;': 'WaitLineBreak;',
 	'attempttowait;': 'WaitLineBreak;',
 	'otherwise:': 'else:',
+	'cocks of player > 0 and cunts of player > 0': 'player is herm',
+	'cunts of player > 0 and cocks of player > 0': 'player is herm',
+	'if cocks of player > 0:': 'if player is male:',
+	'if cunts of player > 0:': 'if player is female:',
+	'if cocks of player > 0]': 'if player is male]',
+	'if cunts of player > 0]': 'if player is female]',
+	'cocks of player is 0 and cunts of player is 0': 'player is neuter',
+	'cunts of player is 0 and cocks of player is 0': 'player is neuter',
+	'cocks of player < 1 and cunts of player < 1': 'player is neuter',
+	'cunts of player < 1 and cocks of player < 1': 'player is neuter',
+
 };
 
 export function activate() {

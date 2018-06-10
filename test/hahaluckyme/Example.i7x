@@ -25,6 +25,13 @@ WaitLineBreak;
 say "...";
 WaitLineBreak;
 
+if cocks of player is 0 and cunts of player is 0: [neuter]
+  say "Oh no";
+if cunts of player > 0: [female]
+  say "Oh yes";
+if cunts of player > 0 and cocks of player > 0: [herm]
+  say "Oh hell yes";
+
 
 say "     'Do not use two spaces after a period.'  I will murder you.";
 
