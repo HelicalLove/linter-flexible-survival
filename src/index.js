@@ -75,6 +75,7 @@ const BRITISH_TO_AMERICAN = {
 	// miscellaneous differences
   'aluminium': 'aluminum',
 	'anticlockwise': 'counterclockwise',
+	'cosy': 'cozy',
 	'femmecum': 'femcum',
 	'oesophagus': 'esophagus',
 	'storey': 'story',
