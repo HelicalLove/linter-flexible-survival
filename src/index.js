@@ -143,6 +143,10 @@ const NON_INTERESTING_WORDS = [
 	'you',
 	'your',
 	'i',
+	'she',
+	'he',
+	'shi',
+	'hir',
 ];
 
 function firstInterestingWord(arrayOfWords) {
