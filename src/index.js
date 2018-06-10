@@ -161,6 +161,62 @@ export function provideLinter() {
         const line = rawLine.trim();
         const lineStartIndex = rawLine.match(/^\s*/)[0].length;
 
+        for (const britishWord in BRITISH_TO_AMERICAN) {
+          const indexOfBritishInvasion = rawLine.indexOf(britishWord);
+          if (indexOfBritishInvasion !== -1) {
+            const americanWord = BRITISH_TO_AMERICAN[britishWord];
+            lints.push({
+              severity: 'warning',
+              location: {
+                file: filePath,
+                position: [[lineIndex, indexOfBritishInvasion], [lineIndex, indexOfBritishInvasion + britishWord.length]],
+              },
+              excerpt: `Prefer the American spelling '${americanWord}' instead of British '${britishWord}'`,
+              solutions: [{
+								position: [[lineIndex, indexOfBritishInvasion], [lineIndex, indexOfBritishInvasion + britishWord.length]],
+								replaceWith: americanWord,
+              }],
+            });
+          }
+        }
+
+				const whitespaceAtEndOfLine = rawLine.match(/\s*$/);
+        if (whitespaceAtEndOfLine[0].length > 0) {
+					lints.push({
+            severity: 'error',
+            location: {
+              file: filePath,
+              position: [[lineIndex, whitespaceAtEndOfLine.index], [lineIndex, rawLine.length]],
+            },
+            excerpt: `Do not have random extra whitespace.`,
+						solutions: [{
+							position: [[lineIndex, whitespaceAtEndOfLine.index], [lineIndex, rawLine.length]],
+							replaceWith: '',
+						}],
+          });
+        }
+
+				const stupidQuotesMatch = rawLine.match(/[“”]/);
+        if (stupidQuotesMatch !== null) {
+					lints.push({
+            severity: 'error',
+            location: {
+              file: filePath,
+              position: [[lineIndex, stupidQuotesMatch.index], [lineIndex, stupidQuotesMatch.index + 1]],
+            },
+            excerpt: `Don't use Smart Quotes! Applications like Word and LibreOffice will not use regular quotes.`,
+						solutions: [{
+							position: [[lineIndex, stupidQuotesMatch.index], [lineIndex, stupidQuotesMatch.index + 1]],
+							replaceWith: '"',
+						}],
+          });
+        }
+
+				// ALL RULES PAST THIS LINE SHOULD NOT WORK ON PURE COMMENT LINES
+				if (line.startsWith('[')) {
+					return;
+				}
+
         const SEMICOLON_END_REQUIRED_STARTS = [
           'say "',
           'now',
@@ -170,7 +226,6 @@ export function provideLinter() {
 					'LineBreak',
 					'WaitLineBreak',
         ];
-
 				for (let i = 0; i < SEMICOLON_END_REQUIRED_STARTS.length; i++) {
 					const startCheck = SEMICOLON_END_REQUIRED_STARTS[i];
 
@@ -179,11 +234,11 @@ export function provideLinter() {
 	            severity: 'error',
 	            location: {
 	              file: filePath,
-	              position: [[lineIndex, rawLine.length-1], [lineIndex, rawLine.length]],
+	              position: [[lineIndex, rawLine.length], [lineIndex, rawLine.length+1]],
 	            },
 	            excerpt: `All '${startCheck}' commands must end in a semicolon ';'`,
 							solutions: [{
-								position: [[lineIndex, rawLine.length-1], [lineIndex, rawLine.length]],
+								position: [[lineIndex, rawLine.length], [lineIndex, rawLine.length+1]],
 								replaceWith: ';',
 							}],
 	          });
@@ -224,25 +279,6 @@ export function provideLinter() {
           });
         }
 
-        for (const britishWord in BRITISH_TO_AMERICAN) {
-          const indexOfBritishInvasion = rawLine.indexOf(britishWord);
-          if (indexOfBritishInvasion !== -1) {
-            const americanWord = BRITISH_TO_AMERICAN[britishWord];
-            lints.push({
-              severity: 'warning',
-              location: {
-                file: filePath,
-                position: [[lineIndex, indexOfBritishInvasion], [lineIndex, indexOfBritishInvasion + britishWord.length]],
-              },
-              excerpt: `Prefer the American spelling '${americanWord}' instead of British '${britishWord}'`,
-              solutions: [{
-								position: [[lineIndex, indexOfBritishInvasion], [lineIndex, indexOfBritishInvasion + britishWord.length]],
-								replaceWith: americanWord,
-              }],
-            });
-          }
-        }
-
 				const impregMatch = rawLine.match(/\[m?impregchance\]/);
         if (impregMatch !== null) {
 					if (text.match(/(setmonster|Choose a blank row from Table of random critters)/) === null) {
@@ -257,38 +293,25 @@ export function provideLinter() {
 					}
         }
 
-				const whitespaceAtEndOfLine = rawLine.match(/\s*$/);
-        if (whitespaceAtEndOfLine[0].length > 0) {
-					lints.push({
-            severity: 'error',
-            location: {
-              file: filePath,
-              position: [[lineIndex, whitespaceAtEndOfLine.index], [lineIndex, rawLine.length]],
-            },
-            excerpt: `Do not have random extra whitespace.`,
-						solutions: [{
-							position: [[lineIndex, whitespaceAtEndOfLine.index], [lineIndex, rawLine.length]],
-							replaceWith: '',
-						}],
-          });
-        }
+				if (line.indexOf('"') !== -1) {
+					const doubleSpaceMatch = rawLine.match(/[.?!]  /);
+	        if (doubleSpaceMatch !== null) {
+						lints.push({
+	            severity: 'warning',
+	            location: {
+	              file: filePath,
+	              position: [[lineIndex, doubleSpaceMatch.index + 1], [lineIndex, doubleSpaceMatch.index + doubleSpaceMatch[0].length]],
+	            },
+	            excerpt: `Use single spaces after punctuation.`,
+							solutions: [{
+								position: [[lineIndex, doubleSpaceMatch.index + 1], [lineIndex, doubleSpaceMatch.index + doubleSpaceMatch[0].length]],
+								replaceWith: ' ',
+							}],
+	          });
+	        }
+				}
 
-				const doubleSpaceMatch = rawLine.match(/[.?!]  /);
-        if (doubleSpaceMatch !== null) {
-					lints.push({
-            severity: 'warning',
-            location: {
-              file: filePath,
-              position: [[lineIndex, doubleSpaceMatch.index + 1], [lineIndex, doubleSpaceMatch.index + doubleSpaceMatch[0].length]],
-            },
-            excerpt: `Use single spaces after punctuation.`,
-						solutions: [{
-							position: [[lineIndex, doubleSpaceMatch.index + 1], [lineIndex, doubleSpaceMatch.index + doubleSpaceMatch[0].length]],
-							replaceWith: ' ',
-						}],
-          });
-        }
-      })
+      });
 
       return lints;
     }
