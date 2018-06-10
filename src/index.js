@@ -11,6 +11,9 @@ const BRITISH_TO_AMERICAN = {
 	'realise': 'realize',
 	'realising': 'realizing',
 	'recognis': 'recogniz',
+	'sympathis': 'sympathiz',
+	'specialise': 'specialize',
+	'specialising': 'specializing',
 	'theoris': 'theoriz',
 
 	// ll vs l
@@ -32,6 +35,7 @@ const BRITISH_TO_AMERICAN = {
 	'behaviour': 'behavior',
 	'colour': 'color',
 	'demeanour': 'demeanor',
+	'enamour': 'enamor',
 	'favour': 'favor',
 	'fervour': 'fervor',
 	'flavour': 'flavor',
