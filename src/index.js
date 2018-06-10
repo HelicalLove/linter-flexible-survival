@@ -92,11 +92,23 @@ const BRITISH_TO_AMERICAN = {
 
 };
 
+// General coding styles that you should not use
+const CODING_STYLE_ERROR_SUPER_SUBSTITUTION = [
+	[/[“”]/, '"', `Don't use Smart Quotes! Change the settings in applications like Word and LibreOffice to use regular quotes.`],
+	[/[‘’]/, '\'', `Don't use Smart Quotes! Change the settings in applications like Word and LibreOffice to use regular quotes.`],
+	[/[⋯…]/, '...', `Don't use Smart Ellipses! Change the settings in applications like Word and LibreOffice to use regular ellipses.`],
+];
+
+// Speech styles that you should not use
+const SPEECH_STYLE_ERROR_SUPER_SUBSTITUTION = [
+];
+
 const FUNCTION_SUBSTITUTIONS = {
 	'if waiterhater is 0, wait for any key;': 'WaitLineBreak;',
 	'if waiterhater is 0 and hypernull is 0, LineBreak;': 'WaitLineBreak;',
 	'attempttowait;': 'WaitLineBreak;',
-	'otherwise:': 'else:',
+	'  otherwise:': '  else:', // to not capture -- otherwise
+	'[otherwise': '[else',
 	'cocks of player > 0 and cunts of player > 0': 'player is herm',
 	'cunts of player > 0 and cocks of player > 0': 'player is herm',
 	'if cocks of player > 0:': 'if player is male:',
@@ -107,8 +119,21 @@ const FUNCTION_SUBSTITUTIONS = {
 	'cunts of player is 0 and cocks of player is 0': 'player is neuter',
 	'cocks of player < 1 and cunts of player < 1': 'player is neuter',
 	'cunts of player < 1 and cocks of player < 1': 'player is neuter',
-
+	'if cocks of player is 0:': 'if player is not male:',
+	'if cunts of player is 0:': 'if player is not female:',
+	'if cocks of player is 0]': 'if player is not male]',
+	'if cunts of player is 0]': 'if player is not female]',
+	'if cocks of player > 0 or cunts of player > 0': 'if player is not neuter',
+	'if cunts of player > 0 or cocks of player > 0': 'if player is not neuter',
+	'if (cocks of player > 0) or (cunts of player > 0)': 'if player is not neuter',
+	'if (cunts of player > 0) or (cocks of player > 0)': 'if player is not neuter',
+	'if (cocks of player > 0 or cunts of player > 0)': 'if player is not neuter',
+	'if (cunts of player > 0 or cocks of player > 0)': 'if player is not neuter',
 };
+
+const FUNCTION_REGEX_SUBSTITUTIONS = [
+	[/if (cocks|cunts) of player =/, 'if $1 of player is'],
+];
 
 export function activate() {
 }
@@ -226,21 +251,46 @@ export function provideLinter() {
           });
         }
 
-				const stupidQuotesMatch = rawLine.match(/[“”]/);
-        if (stupidQuotesMatch !== null) {
-					lints.push({
-            severity: 'error',
-            location: {
-              file: filePath,
-              position: [[lineIndex, stupidQuotesMatch.index], [lineIndex, stupidQuotesMatch.index + 1]],
-            },
-            excerpt: `Don't use Smart Quotes! Change the settings in applications like Word and LibreOffice to use regular quotes.`,
-						solutions: [{
-							position: [[lineIndex, stupidQuotesMatch.index], [lineIndex, stupidQuotesMatch.index + 1]],
-							replaceWith: '"',
-						}],
-          });
-        }
+				for (let i = 0; i < CODING_STYLE_ERROR_SUPER_SUBSTITUTION.length; i++) {
+					const substitution = CODING_STYLE_ERROR_SUPER_SUBSTITUTION[i];
+					const replacer = substitution[1];
+					const excerpt = substitution[2];
+					if (substitution[0] instanceof RegExp) {
+						const regex = substitution[0];
+						const match = rawLine.match(regex);
+						if (match !== null) {
+							lints.push({
+		            severity: 'error',
+		            location: {
+		              file: filePath,
+		              position: [[lineIndex, match.index], [lineIndex, match.index + 1]],
+		            },
+		            excerpt: excerpt,
+								solutions: [{
+									position: [[lineIndex, match.index], [lineIndex, match.index + 1]],
+									replaceWith: replacer,
+								}],
+		          });
+						}
+					} else {
+						const beforeText = substitution[0];
+						const matchIndex = rawLine.indexOf(beforeText);
+						if (matchIndex !== -1) {
+							lints.push({
+								severity: 'error',
+								location: {
+									file: filePath,
+									position: [[lineIndex, matchIndex], [lineIndex, matchIndex + 1]],
+								},
+								excerpt: excerpt,
+								solutions: [{
+									position: [[lineIndex, matchIndex], [lineIndex, matchIndex + 1]],
+									replaceWith: replacer,
+								}],
+							});
+						}
+					}
+				}
 
 				// ALL RULES PAST THIS LINE SHOULD NOT WORK ON PURE COMMENT LINES
 				if (line.startsWith('[')) {
@@ -309,6 +359,49 @@ export function provideLinter() {
           });
 				}
 
+				if (line.startsWith('say "')) {
+					for (let i = 0; i < SPEECH_STYLE_ERROR_SUPER_SUBSTITUTION.length; i++) {
+						const substitution = SPEECH_STYLE_ERROR_SUPER_SUBSTITUTION[i];
+						const replacer = substitution[1];
+						const excerpt = substitution[2];
+						if (substitution[0] instanceof RegExp) {
+							const regex = substitution[0];
+							const match = rawLine.match(regex);
+							if (match !== null) {
+								lints.push({
+			            severity: 'error',
+			            location: {
+			              file: filePath,
+			              position: [[lineIndex, match.index], [lineIndex, match.index + 1]],
+			            },
+			            excerpt: excerpt,
+									solutions: [{
+										position: [[lineIndex, match.index], [lineIndex, match.index + 1]],
+										replaceWith: replacer,
+									}],
+			          });
+							}
+						} else {
+							const beforeText = substitution[0];
+							const matchIndex = rawLine.indexOf(beforeText);
+							if (matchIndex !== -1) {
+								lints.push({
+									severity: 'error',
+									location: {
+										file: filePath,
+										position: [[lineIndex, matchIndex], [lineIndex, matchIndex + 1]],
+									},
+									excerpt: excerpt,
+									solutions: [{
+										position: [[lineIndex, matchIndex], [lineIndex, matchIndex + 1]],
+										replaceWith: replacer,
+									}],
+								});
+							}
+						}
+					}
+				}
+
 				const impregMatch = rawLine.match(/\[m?impregchance\]/);
         if (impregMatch !== null) {
 					if (text.match(/(setmonster|Choose a blank row from Table of random critters)/) === null) {
@@ -341,24 +434,6 @@ export function provideLinter() {
 	        }
 				}
 
-				if (line.indexOf('"') !== -1) {
-					const doubleSpaceMatch = rawLine.match(/[.?!]  /);
-	        if (doubleSpaceMatch !== null) {
-						lints.push({
-	            severity: 'warning',
-	            location: {
-	              file: filePath,
-	              position: [[lineIndex, doubleSpaceMatch.index + 1], [lineIndex, doubleSpaceMatch.index + doubleSpaceMatch[0].length]],
-	            },
-	            excerpt: `Use single spaces after punctuation.`,
-							solutions: [{
-								position: [[lineIndex, doubleSpaceMatch.index + 1], [lineIndex, doubleSpaceMatch.index + doubleSpaceMatch[0].length]],
-								replaceWith: ' ',
-							}],
-	          });
-	        }
-				}
-
         for (const beforeText in FUNCTION_SUBSTITUTIONS) {
 					const beforeTextIndex = rawLine.indexOf(beforeText);
 					if (beforeTextIndex !== -1) {
@@ -372,6 +447,28 @@ export function provideLinter() {
               excerpt: `This style is deprecated. Please use '${afterText}' instead.`,
               solutions: [{
 								position: [[lineIndex, beforeTextIndex], [lineIndex, beforeTextIndex + beforeText.length]],
+								replaceWith: afterText,
+              }],
+            });
+					}
+        }
+
+				for (let i = 0; i < FUNCTION_REGEX_SUBSTITUTIONS.length; i++) {
+					const regexPair = FUNCTION_REGEX_SUBSTITUTIONS[i];
+					const beforeRegex = regexPair[0];
+					const beforeRegexMatch = rawLine.match(beforeRegex);
+					if (beforeRegexMatch !== null) {
+						const afterRegex = regexPair[1];
+						const afterText =beforeRegexMatch[0].replace(beforeRegex, afterRegex)
+            lints.push({
+              severity: 'warning',
+              location: {
+                file: filePath,
+                position: [[lineIndex, beforeRegexMatch.index], [lineIndex, beforeRegexMatch.index + beforeRegexMatch[0].length]],
+              },
+              excerpt: `This style is deprecated. Please use '${afterText}' instead.`,
+              solutions: [{
+								position: [[lineIndex, beforeRegexMatch.index], [lineIndex, beforeRegexMatch.index + beforeRegexMatch[0].length]],
 								replaceWith: afterText,
               }],
             });
