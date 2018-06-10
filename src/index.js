@@ -400,7 +400,7 @@ export function provideLinter() {
 							sentences[i].words.length > 0 && sentences[i-1].words.length > 0 && sentences[i-2].words.length > 0
 								&& sentences[i].words[0] === sentences[i-1].words[0] && sentences[i].words[0] === sentences[i-2].words[0]
 						) {
-							if (sentences[i].words[0] === 'the' || sentences[i].words[0] === 'you') {
+							if (sentences[i].words[0] === 'the' || sentences[i].words[0] === 'you' || sentences[i].words[0] === 'to') {
 								continue;
 							}
 							lints.push({
