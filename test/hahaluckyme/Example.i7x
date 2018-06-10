@@ -18,6 +18,8 @@ say "     I am a very british man! Look at all these colours.";
 
 say "	Dont use tabs instead of spaces";
 
+say "'Dirty cur!' Oh no.";
+
 say “oopsie woopsie wrong quotes”
 
   if waiterhater is 0 and hypernull is 0, LineBreak; [adds a break after the 'more']
@@ -49,7 +51,7 @@ if calcnumber is:
       now PronounChoice of player is "Herm";
   -- 5:
       now PronounChoice of player is "Neutral";
-  -- otherwise:
+  -- else:
       say "Invalid choice. Pick from 0 to 5.";
 
 
@@ -57,4 +59,8 @@ say "Lucky says “Don't use word…”";
 
 say "     'Do not use two spaces after a period.'  I will murder you.";
 
-say "Poop!"
+say "     'Do not use two spaces after a period.'  I will murder you.";
+
+say "I am a new writer. I like to write twice.";
+
+Example ends here.

@@ -107,7 +107,7 @@ const FUNCTION_SUBSTITUTIONS = {
 	'if waiterhater is 0, wait for any key;': 'WaitLineBreak;',
 	'if waiterhater is 0 and hypernull is 0, LineBreak;': 'WaitLineBreak;',
 	'attempttowait;': 'WaitLineBreak;',
-	'  otherwise:': '  else:', // to not capture -- otherwise
+	'	otherwise:': '	else:', // to not capture -- otherwise
 	'[otherwise': '[else',
 	'cocks of player > 0 and cunts of player > 0': 'player is herm',
 	'cunts of player > 0 and cocks of player > 0': 'player is herm',
@@ -360,6 +360,53 @@ export function provideLinter() {
 				}
 
 				if (line.startsWith('say "')) {
+					const startQuoteIndex = rawLine.indexOf('"');
+					const endQuoteIndex = rawLine.lastIndexOf('"');
+
+					const startSpeechIndex = line.substr(5).search(/[^\s]/) + startQuoteIndex + 1;
+					const speechSubstr = rawLine.substr(startSpeechIndex, endQuoteIndex - startSpeechIndex);
+
+					// attempt to extract sentences from speech
+					const sentences = [];
+					let sentenceRegex = /(\.\.\.|[.?!])'? ?/g;
+					let speechRegexMatch = null;
+					let lastSpeechRegexMatchIndex = startSpeechIndex;
+					while ((speechRegexMatch = sentenceRegex.exec(speechSubstr)) !== null) {
+						 const sentence = rawLine.substr(lastSpeechRegexMatchIndex, startSpeechIndex + speechRegexMatch.index + speechRegexMatch[0].length - lastSpeechRegexMatchIndex).trim();
+						 const words = sentence.toLowerCase().replace(/['.,!?-]/g, '').replace(/\s\s+/g, ' ').split(' ');
+						 sentences.push({
+							 sentence,
+							 words,
+							 index: lastSpeechRegexMatchIndex,
+						 })
+						 lastSpeechRegexMatchIndex = startSpeechIndex + speechRegexMatch.index + speechRegexMatch[0].length;
+					}
+					if (lastSpeechRegexMatchIndex !== startSpeechIndex + speechSubstr.length) {
+						const sentence = rawLine.substr(lastSpeechRegexMatchIndex, endQuoteIndex - lastSpeechRegexMatchIndex).trim();
+						const words = sentence.toLowerCase().replace(/['.,!?-]/g, '').replace(/\s\s+/g, ' ').split(' ');
+						sentences.push({
+							sentence,
+							words,
+							index: lastSpeechRegexMatchIndex,
+						})
+					}
+
+					for (let i = 1; i < sentences.length; i++) {
+						if (
+							sentences[i].words.length > 0 && sentences[i-1].words.length > 0
+								&& sentences[i].words[0] === sentences[i-1].words[0]
+						) {
+							lints.push({
+								severity: 'info',
+								location: {
+									file: filePath,
+									position: [[lineIndex, sentences[i].index], [lineIndex, sentences[i].index + sentences[i].sentence.length]],
+								},
+								excerpt: `Dont start sentences with the same word as the previous one.`,
+							});
+						}
+					}
+
 					for (let i = 0; i < SPEECH_STYLE_ERROR_SUPER_SUBSTITUTION.length; i++) {
 						const substitution = SPEECH_STYLE_ERROR_SUPER_SUBSTITUTION[i];
 						const replacer = substitution[1];
