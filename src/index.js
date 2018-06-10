@@ -135,6 +135,24 @@ const FUNCTION_REGEX_SUBSTITUTIONS = [
 	[/if (cocks|cunts) of player =/, 'if $1 of player is'],
 ];
 
+const NON_INTERESTING_WORDS = [
+	'her',
+	'his',
+	'to',
+	'the',
+	'you',
+];
+
+function firstInterestingWord(arrayOfWords) {
+	for (let i = 0; i < arrayOfWords.length; i++) {
+		const word = arrayOfWords[i];
+		if (!NON_INTERESTING_WORDS.includes(word)) {
+			return word;
+		}
+	}
+	return null;
+}
+
 export function activate() {
 }
 
@@ -359,7 +377,8 @@ export function provideLinter() {
           });
 				}
 
-				if (line.startsWith('say "')) {
+				// cant parse special brackets
+				if (line.startsWith('say "') && line.indexOf('[') === -1) {
 					const startQuoteIndex = rawLine.indexOf('"');
 					const endQuoteIndex = rawLine.lastIndexOf('"');
 
@@ -397,21 +416,31 @@ export function provideLinter() {
 							continue;
 						}
 						if (
-							sentences[i].words.length > 0 && sentences[i-1].words.length > 0 && sentences[i-2].words.length > 0
-								&& sentences[i].words[0] === sentences[i-1].words[0] && sentences[i].words[0] === sentences[i-2].words[0]
+							sentences[i].words.length === 0
+							|| sentences[i-1].words.length === 0
+							|| sentences[i-2].words.length === 0
 						) {
-							if (sentences[i].words[0] === 'the' || sentences[i].words[0] === 'you' || sentences[i].words[0] === 'to') {
-								continue;
-							}
-							lints.push({
-								severity: 'info',
-								location: {
-									file: filePath,
-									position: [[lineIndex, sentences[i].index], [lineIndex, sentences[i].index + sentences[i].sentence.length]],
-								},
-								excerpt: `Don't begin sentences with wording too similar to the previous ones.`,
-							});
+							continue;
 						}
+						const word = firstInterestingWord(sentences[i].words);
+						if (word === null) {
+							continue;
+						}
+						if (
+							word !== firstInterestingWord(sentences[i-1].words)
+							|| word !== firstInterestingWord(sentences[i-2].words)
+						) {
+							continue;
+						}
+
+						lints.push({
+							severity: 'info',
+							location: {
+								file: filePath,
+								position: [[lineIndex, sentences[i].index], [lineIndex, sentences[i].index + sentences[i].sentence.length]],
+							},
+							excerpt: `Don't begin sentences with wording too similar to the previous ones.`,
+						});
 					}
 
 					for (let i = 0; i < SPEECH_STYLE_ERROR_SUPER_SUBSTITUTION.length; i++) {
