@@ -247,7 +247,7 @@ export function provideLinter() {
 				}
 
         if (line.startsWith('say "  ')) {
-					const numSpaces = line.substr(5).match(/^\s*/)[0].length;
+					const numSpaces = line.substr(5).match(/^ */)[0].length;
 					if (numSpaces !== 5) {
 						lints.push({
 	            severity: 'warning',
@@ -262,7 +262,22 @@ export function provideLinter() {
 	            excerpt: `Paragraph indentation should be exactly 5 spaces`,
 	          });
 					}
-        }
+				}
+
+				if (line.startsWith('say "\t')) {
+					lints.push({
+            severity: 'warning',
+            location: {
+              file: filePath,
+              position: [[lineIndex, lineStartIndex + 5], [lineIndex, lineStartIndex + 6]],
+            },
+						solutions: [{
+							position: [[lineIndex, lineStartIndex + 5], [lineIndex, lineStartIndex + 6]],
+							replaceWith: '     ',
+						}],
+            excerpt: `Paragraph indentation should use 5 spaces instead of tabs.`,
+          });
+				}
 
         if (line.startsWith('otherwise')) {
           lints.push({
