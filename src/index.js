@@ -81,6 +81,11 @@ const BRITISH_TO_AMERICAN = {
 
 };
 
+const FUNCTION_SUBSTITUTIONS = {
+	'if waiterhater is 0, wait for any key;': 'WaitLineBreak;',
+	'if waiterhater is 0 and hypernull is 0, LineBreak;': 'WaitLineBreak;',
+};
+
 export function activate() {
 }
 
@@ -325,6 +330,43 @@ export function provideLinter() {
 	          });
 	        }
 				}
+
+				if (line.indexOf('"') !== -1) {
+					const doubleSpaceMatch = rawLine.match(/[.?!]  /);
+	        if (doubleSpaceMatch !== null) {
+						lints.push({
+	            severity: 'warning',
+	            location: {
+	              file: filePath,
+	              position: [[lineIndex, doubleSpaceMatch.index + 1], [lineIndex, doubleSpaceMatch.index + doubleSpaceMatch[0].length]],
+	            },
+	            excerpt: `Use single spaces after punctuation.`,
+							solutions: [{
+								position: [[lineIndex, doubleSpaceMatch.index + 1], [lineIndex, doubleSpaceMatch.index + doubleSpaceMatch[0].length]],
+								replaceWith: ' ',
+							}],
+	          });
+	        }
+				}
+
+        for (const beforeText in FUNCTION_SUBSTITUTIONS) {
+					const beforeTextIndex = rawLine.indexOf(beforeText);
+					if (beforeTextIndex !== -1) {
+						const afterText = FUNCTION_SUBSTITUTIONS[beforeText];
+            lints.push({
+              severity: 'warning',
+              location: {
+                file: filePath,
+                position: [[lineIndex, beforeTextIndex], [lineIndex, beforeTextIndex + beforeText.length]],
+              },
+              excerpt: `This style is deprecated. Please use '${afterText}' instead.`,
+              solutions: [{
+								position: [[lineIndex, beforeTextIndex], [lineIndex, beforeTextIndex + beforeText.length]],
+								replaceWith: afterText,
+              }],
+            });
+					}
+        }
 
       });
 

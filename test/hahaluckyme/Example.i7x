@@ -19,4 +19,7 @@ say "	Dont use tabs instead of spaces";
 
 say “oopsie woopsie wrong quotes”
 
+  if waiterhater is 0 and hypernull is 0, LineBreak; [adds a break after the 'more']
+
+
 say "Poop!"
