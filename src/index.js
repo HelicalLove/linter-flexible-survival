@@ -373,7 +373,7 @@ export function provideLinter() {
 					let lastSpeechRegexMatchIndex = startSpeechIndex;
 					while ((speechRegexMatch = sentenceRegex.exec(speechSubstr)) !== null) {
 						 const sentence = rawLine.substr(lastSpeechRegexMatchIndex, startSpeechIndex + speechRegexMatch.index + speechRegexMatch[0].length - lastSpeechRegexMatchIndex).trim();
-						 const words = sentence.toLowerCase().replace(/['.,!?-]/g, '').replace(/\s\s+/g, ' ').split(' ');
+						 const words = sentence.toLowerCase().replace(/['.,!?-]/g, '').replace(/\s\s+/g, ' ').split(' ').map(e => e.trim()).filter(e => e.length > 0);
 						 sentences.push({
 							 sentence,
 							 words,
@@ -383,7 +383,7 @@ export function provideLinter() {
 					}
 					if (lastSpeechRegexMatchIndex !== startSpeechIndex + speechSubstr.length) {
 						const sentence = rawLine.substr(lastSpeechRegexMatchIndex, endQuoteIndex - lastSpeechRegexMatchIndex).trim();
-						const words = sentence.toLowerCase().replace(/['.,!?-]/g, '').replace(/\s\s+/g, ' ').split(' ');
+						const words = sentence.toLowerCase().replace(/['.,!?-]/g, '').replace(/\s\s+/g, ' ').split(' ').map(e => e.trim()).filter(e => e.length > 0);
 						sentences.push({
 							sentence,
 							words,
@@ -391,18 +391,25 @@ export function provideLinter() {
 						})
 					}
 
-					for (let i = 1; i < sentences.length; i++) {
+					for (let i = 2; i < sentences.length; i++) {
+						// cant parse special brackets
+						if (sentences[i].sentence.includes('[')) {
+							continue;
+						}
 						if (
-							sentences[i].words.length > 0 && sentences[i-1].words.length > 0
-								&& sentences[i].words[0] === sentences[i-1].words[0]
+							sentences[i].words.length > 0 && sentences[i-1].words.length > 0 && sentences[i-2].words.length > 0
+								&& sentences[i].words[0] === sentences[i-1].words[0] && sentences[i].words[0] === sentences[i-2].words[0]
 						) {
+							if (sentences[i].words[0] === 'the' || sentences[i].words[0] === 'you') {
+								continue;
+							}
 							lints.push({
 								severity: 'info',
 								location: {
 									file: filePath,
 									position: [[lineIndex, sentences[i].index], [lineIndex, sentences[i].index + sentences[i].sentence.length]],
 								},
-								excerpt: `Dont start sentences with the same word as the previous one.`,
+								excerpt: `Don't begin sentences with wording too similar to the previous ones.`,
 							});
 						}
 					}
