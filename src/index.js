@@ -99,6 +99,9 @@ const CODING_STYLE_ERROR_SUPER_SUBSTITUTION = [
 	[/[“”]/, '"', `Don't use Smart Quotes! Change the settings in applications like Word and LibreOffice to use regular quotes.`],
 	[/[‘’]/, '\'', `Don't use Smart Quotes! Change the settings in applications like Word and LibreOffice to use regular quotes.`],
 	[/[⋯…]/, '...', `Don't use Smart Ellipses! Change the settings in applications like Word and LibreOffice to use regular ellipses.`],
+	['say"', 'say "', `Put a space after 'say'.`],
+	['Say "', 'say "', `Don't capitalize 'say'.`],
+	['Say"', 'say "', `Don't capitalize 'say' and also put a space after it.`],
 ];
 
 // Speech styles that you should not use
@@ -346,11 +349,11 @@ export function provideLinter() {
 								severity: 'error',
 								location: {
 									file: filePath,
-									position: [[lineIndex, matchIndex], [lineIndex, matchIndex + 1]],
+									position: [[lineIndex, matchIndex], [lineIndex, matchIndex + beforeText.length]],
 								},
 								excerpt: excerpt,
 								solutions: [{
-									position: [[lineIndex, matchIndex], [lineIndex, matchIndex + 1]],
+									position: [[lineIndex, matchIndex], [lineIndex, matchIndex + beforeText.length]],
 									replaceWith: replacer,
 								}],
 							});
@@ -403,7 +406,7 @@ export function provideLinter() {
 							},
 							solutions: [{
 								position: [[lineIndex, lineStartIndex + 5], [lineIndex, lineStartIndex + numSpaces + 5]],
-								replaceWith: '		 ',
+								replaceWith: '     ',
 							}],
 							excerpt: `Paragraph indentation should be exactly 5 spaces`,
 						});
@@ -458,38 +461,38 @@ export function provideLinter() {
 						})
 					}
 
-					for (let i = 2; i < sentences.length; i++) {
-						// cant parse special brackets
-						if (sentences[i].sentence.includes('[')) {
-							continue;
-						}
-						if (
-							sentences[i].words.length === 0
-							|| sentences[i-1].words.length === 0
-							|| sentences[i-2].words.length === 0
-						) {
-							continue;
-						}
-						const word = firstInterestingWord(sentences[i].words);
-						if (word === null) {
-							continue;
-						}
-						if (
-							word !== firstInterestingWord(sentences[i-1].words)
-							|| word !== firstInterestingWord(sentences[i-2].words)
-						) {
-							continue;
-						}
-
-						lints.push({
-							severity: 'info',
-							location: {
-								file: filePath,
-								position: [[lineIndex, sentences[i].index], [lineIndex, sentences[i].index + sentences[i].sentence.length]],
-							},
-							excerpt: `Don't begin sentences with wording too similar to the previous ones.`,
-						});
-					}
+					// for (let i = 2; i < sentences.length; i++) {
+					// 	// cant parse special brackets
+					// 	if (sentences[i].sentence.includes('[')) {
+					// 		continue;
+					// 	}
+					// 	if (
+					// 		sentences[i].words.length === 0
+					// 		|| sentences[i-1].words.length === 0
+					// 		|| sentences[i-2].words.length === 0
+					// 	) {
+					// 		continue;
+					// 	}
+					// 	const word = firstInterestingWord(sentences[i].words);
+					// 	if (word === null) {
+					// 		continue;
+					// 	}
+					// 	if (
+					// 		word !== firstInterestingWord(sentences[i-1].words)
+					// 		|| word !== firstInterestingWord(sentences[i-2].words)
+					// 	) {
+					// 		continue;
+					// 	}
+					//
+					// 	lints.push({
+					// 		severity: 'info',
+					// 		location: {
+					// 			file: filePath,
+					// 			position: [[lineIndex, sentences[i].index], [lineIndex, sentences[i].index + sentences[i].sentence.length]],
+					// 		},
+					// 		excerpt: `Don't begin sentences with wording too similar to the previous ones.`,
+					// 	});
+					// }
 
 					for (let i = 0; i < SPEECH_STYLE_ERROR_SUPER_SUBSTITUTION.length; i++) {
 						const substitution = SPEECH_STYLE_ERROR_SUPER_SUBSTITUTION[i];
@@ -606,7 +609,7 @@ export function provideLinter() {
 					}
 				}
 
-				const changeEntryMatch = line.match(/^now (face|body|skin|cock) change entry is "(.+?)\.";/);
+				const changeEntryMatch = line.match(/^now (face|body|skin|ass|cock)(change)? entry is "(.+?)\.";/);
 				if (changeEntryMatch !== null) {
 					lints.push({
 						severity: 'warning',
@@ -614,7 +617,7 @@ export function provideLinter() {
 							file: filePath,
 							position: [[lineIndex, changeEntryMatch.index + changeEntryMatch[0].length - 2], [lineIndex, changeEntryMatch.index + changeEntryMatch[0].length - 1]],
 						},
-						excerpt: `Do not put periods at the end of ${changeEntryMatch[1]} change entries.`,
+						excerpt: `Do not put periods at the end of ${changeEntryMatch[1]} ${changeEntryMatch[2]} entries.`,
 						solutions: [{
 							position: [[lineIndex, changeEntryMatch.index + changeEntryMatch[0].length - 2], [lineIndex, changeEntryMatch.index + changeEntryMatch[0].length - 1]],
 							replaceWith: '',
@@ -630,7 +633,7 @@ export function provideLinter() {
 							file: filePath,
 							position: [[lineIndex, entryMatch.index + entryMatch[0].length - 2], [lineIndex, entryMatch.index + entryMatch[0].length - 1]],
 						},
-						excerpt: `Put a period at the end of ass entries (NOT change entries).`,
+						excerpt: `Put a period at the end of tail entries (NOT tail change entries).`,
 						solutions: [{
 							position: [[lineIndex, entryMatch.index + entryMatch[0].length - 1], [lineIndex, entryMatch.index + entryMatch[0].length - 1]],
 							replaceWith: '.',

@@ -8,6 +8,9 @@ to say foo:
 		say " What happened?";
 	otherwise:
 		say "     Sad life";
+		say"oh no";
+		Say"oh no";
+		Say "oh no";
 
 						say " What happened?";
 						say "  What happened?";
