@@ -18,6 +18,7 @@ const BRITISH_TO_AMERICAN = {
 	'theoris': 'theoriz',
 
 	// ll vs l
+	'chisell': 'chisel',
 	'fuell': 'fuel',
 	'handfull': 'handful',
 	'travell': 'travel',
