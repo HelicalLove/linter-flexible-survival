@@ -246,8 +246,8 @@ export function provideLinter() {
 				const indentationMatch = lines[i].match(/^[ \t]+/);
 				if (indentationMatch !== null && indentationMatch[0].includes(' ')) {
 					const fixedText = text.replace(
-						/\n(  |\t)+/g,
-						(spaces) => spaces.replace(/  /g, '\t'),
+						/\n[ \t]+/g,
+						(spaces) => spaces.replace(/ ( |\t)/g, '\t'),
 					);
 					lints.push({
 						severity: 'error',
@@ -378,7 +378,7 @@ export function provideLinter() {
 					}
 				}
 
-				if (line.startsWith('say " ')) {
+				if (line.startsWith('say "  ')) {
 					const numSpaces = line.substr(5).match(/^ */)[0].length;
 					if (numSpaces !== 5) {
 						lints.push({
