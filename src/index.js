@@ -243,7 +243,7 @@ export function provideLinter() {
 			}
 
 			for (let i = 0; i < lines.length; i++) {
-				const indentationMatch = lines[i].match(/^[ \t]+/);
+				const indentationMatch = lines[i].match(/^( [ \t]|\t)+/);
 				if (indentationMatch !== null && indentationMatch[0].includes(' ')) {
 					const fixedText = text.replace(
 						/\n[ \t]+/g,
@@ -261,6 +261,18 @@ export function provideLinter() {
 							apply: () => textEditor.setText(fixedText),
 						}],
 					});
+				} else {
+					const oddIndentationMatch = lines[i].match(/^\t* [^ ]/);
+					if (oddIndentationMatch !== null) {
+						lints.push({
+							severity: 'error',
+							location: {
+								file: filePath,
+								position: [[i, 0], [i, oddIndentationMatch[0].length]],
+							},
+							excerpt: `You are starting some of your lines with spaces instead of tabs. You MUST use tabs for Inform. Configure your text editor to use tabs instead of spaces. I cannot autofix this one because there are an ODD number of spaces, which makes it ambiguous which direction it should go.`,
+						});
+					}
 				}
 			}
 
