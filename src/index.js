@@ -592,7 +592,7 @@ export function provideLinter() {
 					}
 				}
 
-				const changeEntryMatch = line.match(/^now (face|body|skin|ass|cock) change entry is "(.+?)\.";/);
+				const changeEntryMatch = line.match(/^now (face|body|skin|cock) change entry is "(.+?)\.";/);
 				if (changeEntryMatch !== null) {
 					lints.push({
 						severity: 'warning',
@@ -604,6 +604,22 @@ export function provideLinter() {
 						solutions: [{
 							position: [[lineIndex, changeEntryMatch.index + changeEntryMatch[0].length - 2], [lineIndex, changeEntryMatch.index + changeEntryMatch[0].length - 1]],
 							replaceWith: '',
+						}],
+					});
+				}
+
+				const entryMatch = line.match(/^now tail entry is "(.+?)[^\.]";/);
+				if (entryMatch !== null) {
+					lints.push({
+						severity: 'warning',
+						location: {
+							file: filePath,
+							position: [[lineIndex, entryMatch.index + entryMatch[0].length - 2], [lineIndex, entryMatch.index + entryMatch[0].length - 1]],
+						},
+						excerpt: `Put a period at the end of ass entries (NOT change entries).`,
+						solutions: [{
+							position: [[lineIndex, entryMatch.index + entryMatch[0].length - 1], [lineIndex, entryMatch.index + entryMatch[0].length - 1]],
+							replaceWith: '.',
 						}],
 					});
 				}
