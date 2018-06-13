@@ -107,7 +107,7 @@ const FUNCTION_SUBSTITUTIONS = {
 	'if waiterhater is 0, wait for any key;': 'WaitLineBreak;',
 	'if waiterhater is 0 and hypernull is 0, LineBreak;': 'WaitLineBreak;',
 	'attempttowait;': 'WaitLineBreak;',
-	'  otherwise:': '  else:', // to not capture -- otherwise
+	'	otherwise:': '	else:', // to not capture -- otherwise
 	'[otherwise': '[else',
 	'cocks of player > 0 and cunts of player > 0': 'player is herm',
 	'cunts of player > 0 and cocks of player > 0': 'player is herm',
@@ -242,6 +242,28 @@ export function provideLinter() {
 				});
 			}
 
+			for (let i = 0; i < lines.length; i++) {
+				const indentationMatch = lines[i].match(/^[ \t]+/);
+				if (indentationMatch !== null && indentationMatch[0].includes(' ')) {
+					const fixedText = text.replace(
+						/\n(  |\t)+/g,
+						(spaces) => spaces.replace(/  /g, '\t'),
+					);
+					lints.push({
+						severity: 'error',
+						location: {
+							file: filePath,
+							position: [[i, 0], [i, indentationMatch[0].length]],
+						},
+						excerpt: `You are starting some of your lines with spaces instead of tabs. You MUST use tabs for Inform. Configure your text editor to use tabs instead of spaces.`,
+						solutions: [{
+							position: [[i, 0], [i, indentationMatch[0].length]],
+							apply: () => textEditor.setText(fixedText),
+						}],
+					});
+				}
+			}
+
 			lines.forEach((rawLine, lineIndex) => {
 				const line = rawLine.trim();
 				const lineStartIndex = rawLine.match(/^\s*/)[0].length;
@@ -344,7 +366,7 @@ export function provideLinter() {
 							severity: 'error',
 							location: {
 								file: filePath,
-								position: [[lineIndex, rawLine.length], [lineIndex, rawLine.length+1]],
+								position: [[lineIndex, rawLine.length - 1], [lineIndex, rawLine.length]],
 							},
 							excerpt: `All '${startCheck}' commands must end in a semicolon ';'`,
 							solutions: [{
@@ -356,7 +378,7 @@ export function provideLinter() {
 					}
 				}
 
-				if (line.startsWith('say "	')) {
+				if (line.startsWith('say " ')) {
 					const numSpaces = line.substr(5).match(/^ */)[0].length;
 					if (numSpaces !== 5) {
 						lints.push({
