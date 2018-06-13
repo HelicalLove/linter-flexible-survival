@@ -61,6 +61,9 @@ say "     'Do not use two spaces after a period.'  I will murder you.";
 
 say "     'Do not use two spaces after a period.'  I will murder you.";
 
-say "I am a new writer. I like to write twice.";
+say "The crate was tall. The crate was long. The crate was fun to stand on.";
+say "     [line break]";
+
+say "[if cunts of x > 0 and cocks of x is 0]asdf[end if]";
 
 Example ends here.

@@ -83,7 +83,7 @@ const BRITISH_TO_AMERICAN = {
 	'socialis': 'socializ',
 
 	// miscellaneous differences
-  'aluminium': 'aluminum',
+	'aluminium': 'aluminum',
 	'anticlockwise': 'counterclockwise',
 	'cosy': 'cozy',
 	'femmecum': 'femcum',
@@ -107,7 +107,7 @@ const FUNCTION_SUBSTITUTIONS = {
 	'if waiterhater is 0, wait for any key;': 'WaitLineBreak;',
 	'if waiterhater is 0 and hypernull is 0, LineBreak;': 'WaitLineBreak;',
 	'attempttowait;': 'WaitLineBreak;',
-	'	otherwise:': '	else:', // to not capture -- otherwise
+	'  otherwise:': '  else:', // to not capture -- otherwise
 	'[otherwise': '[else',
 	'cocks of player > 0 and cunts of player > 0': 'player is herm',
 	'cunts of player > 0 and cocks of player > 0': 'player is herm',
@@ -129,6 +129,12 @@ const FUNCTION_SUBSTITUTIONS = {
 	'if (cunts of player > 0) or (cocks of player > 0)': 'if player is not neuter',
 	'if (cocks of player > 0 or cunts of player > 0)': 'if player is not neuter',
 	'if (cunts of player > 0 or cocks of player > 0)': 'if player is not neuter',
+	'cocks of x > 0 and cunts of x is 0': 'player is puremale',
+	'cunts of x is 0 and cocks of x > 0': 'player is puremale',
+	'cocks of x is 0 and cunts of x > 0': 'player is purefemale',
+	'cunts of x > 0 and cocks of x is 0': 'player is purefemale',
+	'say "     [line break]";': 'LineBreak;',
+	'say "     [WaitLineBreak]";': 'WaitLineBreak;',
 };
 
 const FUNCTION_REGEX_SUBSTITUTIONS = [
@@ -147,6 +153,7 @@ const NON_INTERESTING_WORDS = [
 	'he',
 	'shi',
 	'hir',
+	'fuck',
 ];
 
 function firstInterestingWord(arrayOfWords) {
@@ -166,31 +173,31 @@ export function deactivate() {
 }
 
 export function provideLinter() {
-  return {
-    name: 'Linter Flexible Survival',
-    scope: 'file',
-    lintsOnChange: true,
-    grammarScopes: ['source.inform7'],
-    lint(textEditor) {
+	return {
+		name: 'Linter Flexible Survival',
+		scope: 'file',
+		lintsOnChange: true,
+		grammarScopes: ['source.inform7'],
+		lint(textEditor) {
 			const fullTitle = textEditor.getTitle();
 			if (!fullTitle.includes('.i7x')) {
 				return [];
 			}
 
-      const filePath = textEditor.getPath();
-      const text = textEditor.getText();
-      if (!filePath || text.length === 0) {
-        return [];
-      }
+			const filePath = textEditor.getPath();
+			const text = textEditor.getText();
+			if (!filePath || text.length === 0) {
+				return [];
+			}
 
-      // sanitize lines
-      const rawLines = text.split('\n');
-      const lines = rawLines.slice(0, -1).map(line => line.replace(/\r$/, ''));
-      lines.push(rawLines[rawLines.length - 1])
+			// sanitize lines
+			const rawLines = text.split('\n');
+			const lines = rawLines.slice(0, -1).map(line => line.replace(/\r$/, ''));
+			lines.push(rawLines[rawLines.length - 1])
 
-      let lints = [];
+			let lints = [];
 
-      const fileName = fullTitle.substr(0, fullTitle.indexOf('.'));
+			const fileName = fullTitle.substr(0, fullTitle.indexOf('.'));
 			if (fileName.toLowerCase().endsWith(' for fs')) {
 				const proposedFileName = fileName.substr(0, fileName.length - 7);
 				lints.push({
@@ -203,76 +210,76 @@ export function provideLinter() {
 				});
 			}
 
-      const folderHierarchy = filePath.split('\\');
-      const folderName = folderHierarchy[folderHierarchy.length-2];
-      if (!(lines[0].includes(fileName) && lines[0].includes(folderName) && lines[0].endsWith('begins here.'))) {
-        lints.push({
-          severity: 'error',
-          location: {
-            file: filePath,
-            position: [[0, 0], [0, lines[0].length+1]],
-          },
-          excerpt: `Your first line should be '${fileName} by ${folderName} begins here.'`,
+			const folderHierarchy = filePath.split('\\');
+			const folderName = folderHierarchy[folderHierarchy.length-2];
+			if (!(lines[0].includes(fileName) && lines[0].includes(folderName) && lines[0].endsWith('begins here.'))) {
+				lints.push({
+					severity: 'error',
+					location: {
+						file: filePath,
+						position: [[0, 0], [0, lines[0].length+1]],
+					},
+					excerpt: `Your first line should be '${fileName} by ${folderName} begins here.'`,
 					solutions: [{
 						position: [[0, 0], [0, 0]],
 						apply: () => textEditor.setText(`${fileName} by ${folderName} begins here.\r\n\r\n` + text),
 					}],
-        });
-      }
+				});
+			}
 
 			if (lines.length > 2 && lines[lines.length-2] !== `${fileName} ends here.` && lines[lines.length-1] !== `${fileName} ends here.`) {
-        lints.push({
-          severity: 'error',
-          location: {
-            file: filePath,
-            position: [[lines.length-2, 0], [lines.length-2, lines[lines.length-2].length]],
-          },
-          excerpt: `Your last line should be '${fileName} ends here.'`,
+				lints.push({
+					severity: 'error',
+					location: {
+						file: filePath,
+						position: [[lines.length-2, 0], [lines.length-2, lines[lines.length-2].length]],
+					},
+					excerpt: `Your last line should be '${fileName} ends here.'`,
 					solutions: [{
 						position: [[0, 0], [0, 0]],
 						apply: () => textEditor.setText(text + `\r\n${fileName} ends here.`),
 					}],
-        });
-      }
+				});
+			}
 
-      lines.forEach((rawLine, lineIndex) => {
-        const line = rawLine.trim();
-        const lineStartIndex = rawLine.match(/^\s*/)[0].length;
+			lines.forEach((rawLine, lineIndex) => {
+				const line = rawLine.trim();
+				const lineStartIndex = rawLine.match(/^\s*/)[0].length;
 
-        for (const britishWord in BRITISH_TO_AMERICAN) {
-          const indexOfBritishInvasion = rawLine.indexOf(britishWord);
-          if (indexOfBritishInvasion !== -1) {
-            const americanWord = BRITISH_TO_AMERICAN[britishWord];
-            lints.push({
-              severity: 'warning',
-              location: {
-                file: filePath,
-                position: [[lineIndex, indexOfBritishInvasion], [lineIndex, indexOfBritishInvasion + britishWord.length]],
-              },
-              excerpt: `Prefer the American spelling '${americanWord}' instead of British '${britishWord}'`,
-              solutions: [{
+				for (const britishWord in BRITISH_TO_AMERICAN) {
+					const indexOfBritishInvasion = rawLine.indexOf(britishWord);
+					if (indexOfBritishInvasion !== -1) {
+						const americanWord = BRITISH_TO_AMERICAN[britishWord];
+						lints.push({
+							severity: 'warning',
+							location: {
+								file: filePath,
+								position: [[lineIndex, indexOfBritishInvasion], [lineIndex, indexOfBritishInvasion + britishWord.length]],
+							},
+							excerpt: `Prefer the American spelling '${americanWord}' instead of British '${britishWord}'`,
+							solutions: [{
 								position: [[lineIndex, indexOfBritishInvasion], [lineIndex, indexOfBritishInvasion + britishWord.length]],
 								replaceWith: americanWord,
-              }],
-            });
-          }
-        }
+							}],
+						});
+					}
+				}
 
 				const whitespaceAtEndOfLine = rawLine.match(/\s*$/);
-        if (whitespaceAtEndOfLine[0].length > 0) {
+				if (whitespaceAtEndOfLine[0].length > 0) {
 					lints.push({
-            severity: 'error',
-            location: {
-              file: filePath,
-              position: [[lineIndex, whitespaceAtEndOfLine.index], [lineIndex, rawLine.length]],
-            },
-            excerpt: `Do not have random extra whitespace.`,
+						severity: 'error',
+						location: {
+							file: filePath,
+							position: [[lineIndex, whitespaceAtEndOfLine.index], [lineIndex, rawLine.length]],
+						},
+						excerpt: `Do not have random extra whitespace.`,
 						solutions: [{
 							position: [[lineIndex, whitespaceAtEndOfLine.index], [lineIndex, rawLine.length]],
 							replaceWith: '',
 						}],
-          });
-        }
+					});
+				}
 
 				for (let i = 0; i < CODING_STYLE_ERROR_SUPER_SUBSTITUTION.length; i++) {
 					const substitution = CODING_STYLE_ERROR_SUPER_SUBSTITUTION[i];
@@ -283,17 +290,17 @@ export function provideLinter() {
 						const match = rawLine.match(regex);
 						if (match !== null) {
 							lints.push({
-		            severity: 'error',
-		            location: {
-		              file: filePath,
-		              position: [[lineIndex, match.index], [lineIndex, match.index + 1]],
-		            },
-		            excerpt: excerpt,
+								severity: 'error',
+								location: {
+									file: filePath,
+									position: [[lineIndex, match.index], [lineIndex, match.index + 1]],
+								},
+								excerpt: excerpt,
 								solutions: [{
 									position: [[lineIndex, match.index], [lineIndex, match.index + 1]],
 									replaceWith: replacer,
 								}],
-		          });
+							});
 						}
 					} else {
 						const beforeText = substitution[0];
@@ -320,66 +327,66 @@ export function provideLinter() {
 					return;
 				}
 
-        const SEMICOLON_END_REQUIRED_STARTS = [
-          'say "',
-          'now',
+				const SEMICOLON_END_REQUIRED_STARTS = [
+					'say "',
+					'now',
 					'let',
 					'setmonster',
 					'choose row',
 					'LineBreak',
 					'WaitLineBreak',
-        ];
+				];
 				for (let i = 0; i < SEMICOLON_END_REQUIRED_STARTS.length; i++) {
 					const startCheck = SEMICOLON_END_REQUIRED_STARTS[i];
 
 					if (line.startsWith(startCheck) && !(line.endsWith(';') || line.endsWith(']'))) {
-	          lints.push({
-	            severity: 'error',
-	            location: {
-	              file: filePath,
-	              position: [[lineIndex, rawLine.length], [lineIndex, rawLine.length+1]],
-	            },
-	            excerpt: `All '${startCheck}' commands must end in a semicolon ';'`,
+						lints.push({
+							severity: 'error',
+							location: {
+								file: filePath,
+								position: [[lineIndex, rawLine.length], [lineIndex, rawLine.length+1]],
+							},
+							excerpt: `All '${startCheck}' commands must end in a semicolon ';'`,
 							solutions: [{
 								position: [[lineIndex, rawLine.length], [lineIndex, rawLine.length+1]],
 								replaceWith: ';',
 							}],
-	          });
+						});
 						break;
-	        }
+					}
 				}
 
-        if (line.startsWith('say "  ')) {
+				if (line.startsWith('say "	')) {
 					const numSpaces = line.substr(5).match(/^ */)[0].length;
 					if (numSpaces !== 5) {
 						lints.push({
-	            severity: 'warning',
-	            location: {
-	              file: filePath,
-	              position: [[lineIndex, lineStartIndex + 5], [lineIndex, lineStartIndex + numSpaces + 5]],
-	            },
+							severity: 'warning',
+							location: {
+								file: filePath,
+								position: [[lineIndex, lineStartIndex + 5], [lineIndex, lineStartIndex + numSpaces + 5]],
+							},
 							solutions: [{
 								position: [[lineIndex, lineStartIndex + 5], [lineIndex, lineStartIndex + numSpaces + 5]],
-								replaceWith: '     ',
+								replaceWith: '		 ',
 							}],
-	            excerpt: `Paragraph indentation should be exactly 5 spaces`,
-	          });
+							excerpt: `Paragraph indentation should be exactly 5 spaces`,
+						});
 					}
 				}
 
 				if (line.startsWith('say "\t')) {
 					lints.push({
-            severity: 'warning',
-            location: {
-              file: filePath,
-              position: [[lineIndex, lineStartIndex + 5], [lineIndex, lineStartIndex + 6]],
-            },
+						severity: 'warning',
+						location: {
+							file: filePath,
+							position: [[lineIndex, lineStartIndex + 5], [lineIndex, lineStartIndex + 6]],
+						},
 						solutions: [{
 							position: [[lineIndex, lineStartIndex + 5], [lineIndex, lineStartIndex + 6]],
-							replaceWith: '     ',
+							replaceWith: '		 ',
 						}],
-            excerpt: `Paragraph indentation should use 5 spaces instead of tabs.`,
-          });
+						excerpt: `Paragraph indentation should use 5 spaces instead of tabs.`,
+					});
 				}
 
 				// cant parse special brackets
@@ -457,17 +464,17 @@ export function provideLinter() {
 							const match = rawLine.match(regex);
 							if (match !== null) {
 								lints.push({
-			            severity: 'error',
-			            location: {
-			              file: filePath,
-			              position: [[lineIndex, match.index], [lineIndex, match.index + 1]],
-			            },
-			            excerpt: excerpt,
+									severity: 'error',
+									location: {
+										file: filePath,
+										position: [[lineIndex, match.index], [lineIndex, match.index + 1]],
+									},
+									excerpt: excerpt,
 									solutions: [{
 										position: [[lineIndex, match.index], [lineIndex, match.index + 1]],
 										replaceWith: replacer,
 									}],
-			          });
+								});
 							}
 						} else {
 							const beforeText = substitution[0];
@@ -491,55 +498,55 @@ export function provideLinter() {
 				}
 
 				const impregMatch = rawLine.match(/\[m?impregchance\]/);
-        if (impregMatch !== null) {
+				if (impregMatch !== null) {
 					if (text.match(/(setmonster|Choose a blank row from Table of random critters)/) === null) {
 						lints.push({
-	            severity: 'info',
-	            location: {
-	              file: filePath,
-	              position: [[lineIndex, impregMatch.index], [lineIndex, impregMatch.index + impregMatch[0].length]],
-	            },
-	            excerpt: `You will probably need 'setmonster' somewhere in this file for impreg to work.`,
-	          });
+							severity: 'info',
+							location: {
+								file: filePath,
+								position: [[lineIndex, impregMatch.index], [lineIndex, impregMatch.index + impregMatch[0].length]],
+							},
+							excerpt: `You will probably need 'setmonster' somewhere in this file for impreg to work.`,
+						});
 					}
-        }
+				}
 
 				if (line.indexOf('"') !== -1) {
-					const doubleSpaceMatch = rawLine.match(/[.?!']  /);
-	        if (doubleSpaceMatch !== null) {
+					const doubleSpaceMatch = rawLine.match(/[.?!']	/);
+					if (doubleSpaceMatch !== null) {
 						lints.push({
-	            severity: 'warning',
-	            location: {
-	              file: filePath,
-	              position: [[lineIndex, doubleSpaceMatch.index + 1], [lineIndex, doubleSpaceMatch.index + doubleSpaceMatch[0].length]],
-	            },
-	            excerpt: `Use single spaces after punctuation.`,
+							severity: 'warning',
+							location: {
+								file: filePath,
+								position: [[lineIndex, doubleSpaceMatch.index + 1], [lineIndex, doubleSpaceMatch.index + doubleSpaceMatch[0].length]],
+							},
+							excerpt: `Use single spaces after punctuation.`,
 							solutions: [{
 								position: [[lineIndex, doubleSpaceMatch.index + 1], [lineIndex, doubleSpaceMatch.index + doubleSpaceMatch[0].length]],
 								replaceWith: ' ',
 							}],
-	          });
-	        }
+						});
+					}
 				}
 
-        for (const beforeText in FUNCTION_SUBSTITUTIONS) {
+				for (const beforeText in FUNCTION_SUBSTITUTIONS) {
 					const beforeTextIndex = rawLine.indexOf(beforeText);
 					if (beforeTextIndex !== -1) {
 						const afterText = FUNCTION_SUBSTITUTIONS[beforeText];
-            lints.push({
-              severity: 'warning',
-              location: {
-                file: filePath,
-                position: [[lineIndex, beforeTextIndex], [lineIndex, beforeTextIndex + beforeText.length]],
-              },
-              excerpt: `This style is deprecated. Please use '${afterText}' instead.`,
-              solutions: [{
+						lints.push({
+							severity: 'warning',
+							location: {
+								file: filePath,
+								position: [[lineIndex, beforeTextIndex], [lineIndex, beforeTextIndex + beforeText.length]],
+							},
+							excerpt: `This style is deprecated. Please use '${afterText}' instead.`,
+							solutions: [{
 								position: [[lineIndex, beforeTextIndex], [lineIndex, beforeTextIndex + beforeText.length]],
 								replaceWith: afterText,
-              }],
-            });
+							}],
+						});
 					}
-        }
+				}
 
 				for (let i = 0; i < FUNCTION_REGEX_SUBSTITUTIONS.length; i++) {
 					const regexPair = FUNCTION_REGEX_SUBSTITUTIONS[i];
@@ -548,24 +555,40 @@ export function provideLinter() {
 					if (beforeRegexMatch !== null) {
 						const afterRegex = regexPair[1];
 						const afterText =beforeRegexMatch[0].replace(beforeRegex, afterRegex)
-            lints.push({
-              severity: 'warning',
-              location: {
-                file: filePath,
-                position: [[lineIndex, beforeRegexMatch.index], [lineIndex, beforeRegexMatch.index + beforeRegexMatch[0].length]],
-              },
-              excerpt: `This style is deprecated. Please use '${afterText}' instead.`,
-              solutions: [{
+						lints.push({
+							severity: 'warning',
+							location: {
+								file: filePath,
+								position: [[lineIndex, beforeRegexMatch.index], [lineIndex, beforeRegexMatch.index + beforeRegexMatch[0].length]],
+							},
+							excerpt: `This style is deprecated. Please use '${afterText}' instead.`,
+							solutions: [{
 								position: [[lineIndex, beforeRegexMatch.index], [lineIndex, beforeRegexMatch.index + beforeRegexMatch[0].length]],
 								replaceWith: afterText,
-              }],
-            });
+							}],
+						});
 					}
-        }
+				}
 
-      });
+				const changeEntryMatch = line.match(/^now (face|body|skin|ass|cock) change entry is "(.+?)\.";/);
+				if (changeEntryMatch !== null) {
+					lints.push({
+						severity: 'warning',
+						location: {
+							file: filePath,
+							position: [[lineIndex, changeEntryMatch.index + changeEntryMatch[0].length - 2], [lineIndex, changeEntryMatch.index + changeEntryMatch[0].length - 1]],
+						},
+						excerpt: `Do not put periods at the end of ${changeEntryMatch[1]} change entries.`,
+						solutions: [{
+							position: [[lineIndex, changeEntryMatch.index + changeEntryMatch[0].length - 2], [lineIndex, changeEntryMatch.index + changeEntryMatch[0].length - 1]],
+							replaceWith: '',
+						}],
+					});
+				}
 
-      return lints;
-    }
-  }
+			});
+
+			return lints;
+		}
+	}
 }
