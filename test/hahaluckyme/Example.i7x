@@ -67,6 +67,7 @@ say "     'Do not use two spaces after a period.'  I will murder you.";
 
 say "The crate was tall. The crate was long. The crate was fun to stand on.";
 say "     [line break]";
+say "     [WaitLineBreak]";
 
 say "[if cunts of x > 0 and cocks of x is 0]asdf[end if]";
 

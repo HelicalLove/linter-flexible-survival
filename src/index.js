@@ -99,9 +99,6 @@ const CODING_STYLE_ERROR_SUPER_SUBSTITUTION = [
 	[/[“”]/, '"', `Don't use Smart Quotes! Change the settings in applications like Word and LibreOffice to use regular quotes.`],
 	[/[‘’]/, '\'', `Don't use Smart Quotes! Change the settings in applications like Word and LibreOffice to use regular quotes.`],
 	[/[⋯…]/, '...', `Don't use Smart Ellipses! Change the settings in applications like Word and LibreOffice to use regular ellipses.`],
-	['say"', 'say "', `Put a space after 'say'.`],
-	['Say "', 'say "', `Don't capitalize 'say'.`],
-	['Say"', 'say "', `Don't capitalize 'say' and also put a space after it.`],
 ];
 
 // Speech styles that you should not use
@@ -140,6 +137,9 @@ const FUNCTION_SUBSTITUTIONS = {
 	'cunts of x > 0 and cocks of x is 0': 'player is purefemale',
 	'say "     [line break]";': 'LineBreak;',
 	'say "     [WaitLineBreak]";': 'WaitLineBreak;',
+	'say"': 'say "',
+	'Say "': 'say "',
+	'Say"': 'say "',
 };
 
 const FUNCTION_REGEX_SUBSTITUTIONS = [
