@@ -88,7 +88,7 @@ const BRITISH_TO_AMERICAN = {
 	// miscellaneous differences
 	'aluminium': 'aluminum',
 	'anticlockwise': 'counterclockwise',
-	'cosy': 'cozy',
+	' cosy': ' cozy',
 	'femmecum': 'femcum',
 	'oesophagus': 'esophagus',
 	'storey': 'story',
@@ -138,7 +138,6 @@ const FUNCTION_SUBSTITUTIONS = {
 	'cunts of x > 0 and cocks of x is 0': 'player is purefemale',
 	'say "     [line break]";': 'LineBreak;',
 	'say "     [WaitLineBreak]";': 'WaitLineBreak;',
-	'say"': 'say "',
 	'Say "': 'say "',
 	'Say"': 'say "',
 };
@@ -638,6 +637,22 @@ export function provideLinter() {
 						solutions: [{
 							position: [[lineIndex, entryMatch.index + entryMatch[0].length - 1], [lineIndex, entryMatch.index + entryMatch[0].length - 1]],
 							replaceWith: '.',
+						}],
+					});
+				}
+
+				const spaceAfterOperatorMatch = line.match(/(<=|>=|<|>|==)[^ <=>]/);
+				if (spaceAfterOperatorMatch !== null) {
+					lints.push({
+						severity: 'error',
+						location: {
+							file: filePath,
+							position: [[lineIndex, spaceAfterOperatorMatch.index], [lineIndex, spaceAfterOperatorMatch.index + spaceAfterOperatorMatch[0].length - 1]],
+						},
+						excerpt: `You need a space after ${spaceAfterOperatorMatch[1]} operators.`,
+						solutions: [{
+							position: [[lineIndex, spaceAfterOperatorMatch.index + spaceAfterOperatorMatch[0].length - 1], [lineIndex, spaceAfterOperatorMatch.index + spaceAfterOperatorMatch[0].length - 1]],
+							replaceWith: ' ',
 						}],
 					});
 				}

@@ -61,6 +61,9 @@ if calcnumber is:
 
 say "Lucky says “Don't use word…”";
 
+if test >=3sdf:
+	say "Well poop";
+
 say "     'Do not use two spaces after a period.'  I will murder you.";
 
 say "     'Do not use two spaces after a period.'  I will murder you.";
