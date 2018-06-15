@@ -641,7 +641,7 @@ export function provideLinter() {
 					});
 				}
 
-				const spaceAfterOperatorMatch = line.match(/(<=|>=|<|>|==)[^ <=>]/);
+				const spaceAfterOperatorMatch = line.match(/(<=|>=|==)[^ <=>]/);
 				if (spaceAfterOperatorMatch !== null) {
 					lints.push({
 						severity: 'error',
