@@ -171,6 +171,290 @@ function firstInterestingWord(arrayOfWords) {
 	return null;
 }
 
+function parseInformLanguage(rawText) {
+	const nodes = [];
+	const lines = rawText.split('\n');
+	let isMultilineComment = false;
+	lines.forEach((rawLine, rowIndex) => {
+		let match = rawLine.match(/^(\t*)(.*?)( *\[[^;.:\r]*)?\r?$/);
+
+		if (match === null) {
+			console.error(`${rowIndex}:0 (zero indexed) is not parsed correctly: ${rawLine}`);
+			return;
+		}
+
+		[_, tabs, line, comment] = match;
+
+		if (line.match(/^\[.*\]$/) !== null) {
+			// just a single line comment
+			return;
+		} else if (line.match(/^\]$/) !== null) {
+			// ends a multiline comment
+			if (isMultilineComment) {
+				isMultilineComment = false;
+				return;
+			} else {
+				console.error(`${rowIndex}:0 (zero indexed) is trying to end a multiline comment but there was none to end`);
+			}
+		} else if (comment !== undefined && !comment.endsWith(']')) {
+			// starts a multiline comment
+			isMultilineComment = true;
+		}
+
+		if (isMultilineComment) {
+			return;
+		}
+
+		const node = {
+			indentation: tabs.length,
+			rowIndex: rowIndex,
+			columnIndex: tabs.length,
+			rawTextLength: line.length,
+			rawText: line,
+		};
+
+		if (line.length === 0) {
+			return;
+		}
+
+		// = DECLARATIONS
+
+		match = line.match(/^(.+) by (.+) begins here.$/);
+		if (match !== null) {
+			[_, filename, author] = match;
+			nodes.push({
+				...node,
+				type: 'start declaration',
+				filename,
+				author,
+			});
+			return;
+		}
+
+		match = line.match(/^(.+) ends here.$/);
+		if (match !== null) {
+			[_, filename] = match;
+			nodes.push({
+				...node,
+				type: 'end declaration',
+				filename,
+			});
+			return;
+		}
+
+		match = line.match(/^(.+) is a (.+).$/);
+		if (match !== null) {
+			[_, variableName, variableType] = match;
+			nodes.push({
+				...node,
+				type: 'variable declaration',
+				variableName,
+				variableType,
+			});
+			return;
+		}
+
+		match = line.match(/^(.+) is usually (.+).$/);
+		if (match !== null) {
+			[_, variableName, variableValue] = match;
+			nodes.push({
+				...node,
+				type: 'variable usually declaration',
+				variableName,
+				variableValue,
+			});
+			return;
+		}
+
+		match = line.match(/^(.+) of (.+) is (.+).$/);
+		if (match !== null) {
+			[_, propertyName, variableName, variableValue] = match;
+			nodes.push({
+				...node,
+				type: 'variable property declaration',
+				propertyName,
+				variableName,
+				variableValue,
+			});
+			return;
+		}
+
+		match = line.match(/^Section (.+) - (.+).$/);
+		if (match !== null) {
+			[_, sectionName, sectionValue] = match;
+			nodes.push({
+				...node,
+				type: 'section declaration',
+				sectionName,
+				sectionValue,
+			});
+			return;
+		}
+
+		// = RULES
+
+		match = line.match(/^when (.+):$/);
+		if (match !== null) {
+			[_, condition] = match;
+			nodes.push({
+				...node,
+				type: 'when rule',
+				condition,
+			});
+			return;
+		}
+
+		match = line.match(/^to say (.+):$/);
+		if (match !== null) {
+			[_, ruleName] = match;
+			nodes.push({
+				...node,
+				type: 'to say rule',
+				ruleName,
+			});
+			return;
+		}
+
+		match = line.match(/^instead of (.+):$/);
+		if (match !== null) {
+			[_, condition] = match;
+			nodes.push({
+				...node,
+				type: 'instead of rule',
+				condition,
+			});
+			return;
+		}
+
+		// = ACTIONS
+
+		match = line.match(/^say "(.*)";$/);
+		if (match !== null) {
+			[_, speech] = match;
+			nodes.push({
+				...node,
+				type: 'say action',
+				speech,
+			});
+			return;
+		}
+
+		match = line.match(/^add (.+) to (.+) of (.+);$/);
+		if (match !== null) {
+			[_, property, variable, value] = match;
+			nodes.push({
+				...node,
+				type: 'add action',
+				property,
+				variable,
+				value,
+			});
+			return;
+		}
+
+		match = line.match(/^now (.+) is (.+);$/);
+		if (match !== null) {
+			[_, name, value] = match;
+			nodes.push({
+				...node,
+				type: 'now action',
+				name,
+				value,
+			});
+			return;
+		}
+
+		match = line.match(/^(.+);$/);
+		if (match !== null) {
+			[_, functionName] = match;
+			nodes.push({
+				...node,
+				type: 'function action',
+				functionName,
+			});
+			return;
+		}
+
+		// = CONDITIONS
+
+		match = line.match(/^if (.+):$/);
+		if (match !== null) {
+			[_, condition] = match;
+			nodes.push({
+				...node,
+				type: 'if condition',
+				condition,
+			});
+			return;
+		}
+
+		match = line.match(/^else if (.+):$/);
+		if (match !== null) {
+			[_, condition] = match;
+			nodes.push({
+				...node,
+				type: 'else if condition',
+				condition,
+			});
+			return;
+		}
+
+		match = line.match(/^else:$/);
+		if (match !== null) {
+			nodes.push({
+				...node,
+				type: 'else condition',
+			});
+			return;
+		}
+
+		match = line.match(/^while (.+):$/);
+		if (match !== null) {
+			[_, condition] = match;
+			nodes.push({
+				...node,
+				type: 'while condition',
+				condition,
+			});
+			return;
+		}
+
+		match = line.match(/^repeat with (.+) running from (.+) to (.+):$/);
+		if (match !== null) {
+			[_, variableName, startValue, endValue, tableName] = match;
+			nodes.push({
+				...node,
+				type: 'repeat from to condition',
+				condition,
+				startValue,
+				endValue,
+				tableName,
+			});
+			return;
+		}
+
+		match = line.match(/^repeat with (.+) through (.+):$/);
+		if (match !== null) {
+			[_, variableName, startValue, endValue, tableName] = match;
+			nodes.push({
+				...node,
+				type: 'repeat through condition',
+				condition,
+				startValue,
+				endValue,
+				tableName,
+			});
+			return;
+		}
+
+		nodes.push({
+			...node,
+			type: 'unknown',
+		});
+	});
+	return nodes;
+}
+
 export function activate() {
 }
 
@@ -185,65 +469,126 @@ export function provideLinter() {
 		grammarScopes: ['source.inform7'],
 		lint(textEditor) {
 			const fullTitle = textEditor.getTitle();
+			const filePath = textEditor.getPath();
+			const text = textEditor.getText();
+			const fileName = fullTitle.substr(0, fullTitle.indexOf('.'));
+			const folderHierarchy = filePath.split('\\');
+			const folderName = folderHierarchy[folderHierarchy.length-2];
+
 			if (!fullTitle.includes('.i7x')) {
 				return [];
 			}
 
-			const filePath = textEditor.getPath();
-			const text = textEditor.getText();
 			if (!filePath || text.length === 0) {
 				return [];
 			}
 
-			// sanitize lines
-			const rawLines = text.split('\n');
-			const lines = rawLines.slice(0, -1).map(line => line.replace(/\r$/, ''));
-			lines.push(rawLines[rawLines.length - 1])
+			try {
+				parsedNodes = parseInformLanguage(text);
+			} catch (e) {
+				atom.notifications.addFatalError(`Error parsing file: ${e}`);
+				console.error(e);
+				return [];
+			}
 
-			let lints = [];
+			const lints = [];
+			const lines = text.split('\r\n');
 
-			const fileName = fullTitle.substr(0, fullTitle.indexOf('.'));
-			if (fileName.toLowerCase().endsWith(' for fs')) {
+			function makeLintFromNode(node, extraOptions) {
+				return makeLintOnLine(node.rowIndex, {
+					fromIndex: node.columnIndex,
+					toIndex: node.columnIndex + node.columnIndex + node.rawTextLength,
+					...extraOptions,
+				});
+			}
+
+			function makeLintOnLine(lineIndex, {fromIndex, toIndex, replaceWith, apply}) {
+				if (lineIndex < 0) {
+					lineIndex = lines.length + lineIndex;
+				}
+				fromIndex = fromIndex || 0;
+				toIndex = toIndex === undefined
+				 	? (fromIndex + lines[lineIndex].length)
+					: (toIndex < 0 ? (lines[lineIndex].length + toIndex) : toIndex);
+				const solutions = [];
+				if (replaceWith !== undefined) {
+					solutions.push({
+						position: [[lineIndex, fromIndex], [lineIndex, toIndex]],
+						replaceWith,
+					});
+				}
+				if (apply !== undefined) {
+					solutions.push({
+						position: [[0, 0], [0, 0]],
+						apply,
+					});
+				}
+				return {
+					location: {
+						file: filePath,
+						position: [[lineIndex, fromIndex], [lineIndex, toIndex]],
+					},
+					...(solutions.length === 0 ? {} : {solutions}),
+				};
+			}
+
+			function makeLintApply({replaceWith, apply}) {
+				return {
+					location: {
+						file: filePath,
+						position: [[lineIndex, fromIndex], [lineIndex, toIndex]],
+					},
+					...(solutions.length === 0 ? {} : {solutions}),
+				};
+			}
+
+			if (fileName.toLowerCase().includes(' for fs')) {
 				const proposedFileName = fileName.substr(0, fileName.length - 7);
 				lints.push({
 					severity: 'error',
 					location: {
 						file: filePath,
-						position: [[0, 0], [0, lines[0].length+1]],
+						position: [[0, 0], [0, 0]],
 					},
 					excerpt: `Don't add 'for fs' in your filename. Just use '${proposedFileName}'`,
 				});
 			}
 
-			const folderHierarchy = filePath.split('\\');
-			const folderName = folderHierarchy[folderHierarchy.length-2];
-			if (!(lines[0].includes(fileName) && lines[0].includes(folderName) && lines[0].endsWith('begins here.'))) {
+			const firstNode = parsedNodes[0];
+			if (firstNode.type === 'start declaration') {
+				if (firstNode.filename !== fileName || firstNode.author !== folderName) {
+					lints.push({
+						...makeLintFromNode(firstNode, {replaceWith: `${fileName} by ${folderName} begins here.`}),
+						severity: 'error',
+						excerpt: `Your first line should be '${fileName} by ${folderName} begins here.'`,
+					});
+				}
+			} else {
 				lints.push({
+					...makeLintOnLine(0, {
+						apply: () => textEditor.setText(`${fileName} by ${folderName} begins here.\r\n\r\n${text}`),
+					}),
 					severity: 'error',
-					location: {
-						file: filePath,
-						position: [[0, 0], [0, lines[0].length+1]],
-					},
 					excerpt: `Your first line should be '${fileName} by ${folderName} begins here.'`,
-					solutions: [{
-						position: [[0, 0], [0, 0]],
-						apply: () => textEditor.setText(`${fileName} by ${folderName} begins here.\r\n\r\n` + text),
-					}],
 				});
 			}
 
-			if (lines.length > 2 && lines[lines.length-2] !== `${fileName} ends here.` && lines[lines.length-1] !== `${fileName} ends here.`) {
+			const lastNode = parsedNodes[parsedNodes.length-1];
+			if (lastNode.type === 'end declaration') {
+				if (lastNode.filename !== fileName) {
+					lints.push({
+						...makeLintFromNode(lastNode, {replaceWith: `${fileName} ends here.`}),
+						severity: 'error',
+						excerpt: `Your last line should be '${fileName} ends here.'`,
+					});
+				}
+			} else {
 				lints.push({
+					...makeLintOnLine(-1, {
+						apply: () => textEditor.setText(`${text}\r\n\r\n${fileName} ends here.`),
+					}),
 					severity: 'error',
-					location: {
-						file: filePath,
-						position: [[lines.length-2, 0], [lines.length-2, lines[lines.length-2].length]],
-					},
 					excerpt: `Your last line should be '${fileName} ends here.'`,
-					solutions: [{
-						position: [[0, 0], [0, 0]],
-						apply: () => textEditor.setText(text + `\r\n${fileName} ends here.`),
-					}],
 				});
 			}
 
