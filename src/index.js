@@ -106,6 +106,10 @@ const CODING_STYLE_ERROR_SUPER_SUBSTITUTION = [
 const SPEECH_STYLE_ERROR_SUPER_SUBSTITUTION = [
 ];
 
+const CONDITION_REGEX = [
+	[/^cocks of player > 0$/, 'player is male'],
+];
+
 const FUNCTION_SUBSTITUTIONS = {
 	'if waiterhater is 0, wait for any key;': 'WaitLineBreak;',
 	'if waiterhater is 0 and hypernull is 0, LineBreak;': 'WaitLineBreak;',
@@ -114,7 +118,6 @@ const FUNCTION_SUBSTITUTIONS = {
 	'[otherwise': '[else',
 	'cocks of player > 0 and cunts of player > 0': 'player is herm',
 	'cunts of player > 0 and cocks of player > 0': 'player is herm',
-	'if cocks of player > 0:': 'if player is male:',
 	'if cunts of player > 0:': 'if player is female:',
 	'if cocks of player > 0]': 'if player is male]',
 	'if cunts of player > 0]': 'if player is female]',
@@ -218,13 +221,13 @@ function parseInformLanguage(rawText) {
 		}
 
 		// = DECLARATIONS
-
-		match = line.match(/^(.+) by (.+) begins here.$/);
+		match = line.match(/^(?:Version (.+) of )?(.+?) by (.+) begins here.$/);
 		if (match !== null) {
-			[_, filename, author] = match;
+			[_, version, filename, author] = match;
 			nodes.push({
 				...node,
 				type: 'start declaration',
+				version,
 				filename,
 				author,
 			});
@@ -328,14 +331,14 @@ function parseInformLanguage(rawText) {
 
 		// = ACTIONS
 
-		match = line.match(/^say "(.*)";$/);
+		match = line.match(/^(say ")(.*)";$/);
 		if (match !== null) {
-			[_, speech] = match;
+			[_, keyword, speech] = match;
 			nodes.push({
 				...node,
 				type: 'say action',
 				speech,
-				speechIndex: node.columnIndex + 5,
+				speechIndex: node.columnIndex + keyword.length,
 			});
 			return;
 		}
@@ -378,24 +381,26 @@ function parseInformLanguage(rawText) {
 
 		// = CONDITIONS
 
-		match = line.match(/^if (.+):$/);
+		match = line.match(/^(if )(.+):$/);
 		if (match !== null) {
-			[_, condition] = match;
+			[_, keyword, condition] = match;
 			nodes.push({
 				...node,
 				type: 'if condition',
 				condition,
+				conditionIndex: node.columnIndex + keyword.length,
 			});
 			return;
 		}
 
-		match = line.match(/^else if (.+):$/);
+		match = line.match(/^(else if )(.+):$/);
 		if (match !== null) {
-			[_, condition] = match;
+			[_, keyword, condition] = match;
 			nodes.push({
 				...node,
 				type: 'else if condition',
 				condition,
+				conditionIndex: node.columnIndex + keyword.length,
 			});
 			return;
 		}
@@ -409,13 +414,14 @@ function parseInformLanguage(rawText) {
 			return;
 		}
 
-		match = line.match(/^while (.+):$/);
+		match = line.match(/^(while )(.+):$/);
 		if (match !== null) {
-			[_, condition] = match;
+			[_, keyword, condition] = match;
 			nodes.push({
 				...node,
 				type: 'while condition',
 				condition,
+				conditionIndex: node.columnIndex + keyword.length,
 			});
 			return;
 		}
@@ -426,7 +432,6 @@ function parseInformLanguage(rawText) {
 			nodes.push({
 				...node,
 				type: 'repeat from to condition',
-				condition,
 				startValue,
 				endValue,
 				tableName,
@@ -458,7 +463,10 @@ function parseInformLanguage(rawText) {
 
 String.prototype.forEachMatch = function(regex, lambda) {
 	if (!regex.global) {
-		return lambda(this.match(regex));
+		const match = this.match(regex);
+		if (match !== null) {
+			lambda(match);
+		}
 	} else {
 		let match = null;
 
@@ -660,6 +668,24 @@ export function provideLinter() {
 								});
 							}
 						}
+						return;
+					case 'if condition':
+					case 'else if condition':
+					case 'while condition':
+						CONDITION_REGEX.forEach(([regex, replaceWith]) => {
+							node.condition.forEachMatch(regex, match => {
+								lints.push({
+									...makeLintOnLine(node.rowIndex, {
+										fromIndex: node.conditionIndex + match.index,
+										toIndex: node.conditionIndex + match.index + match[0].length,
+										replaceWith,
+									}),
+									severity: 'warning',
+									excerpt: `This style is deprecated. Please use '${replaceWith}' instead.`,
+								});
+							});
+						});
+						return;
 				}
 			});
 
