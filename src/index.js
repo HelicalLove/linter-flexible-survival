@@ -191,13 +191,13 @@ function parseInformLanguage(rawText) {
 		if (line.match(/^\[.*\]$/) !== null) {
 			// just a single line comment
 			return;
-		} else if (line.match(/^\]$/) !== null) {
+		} else if (line.match(/\]$/) !== null) {
 			// ends a multiline comment
 			if (isMultilineComment) {
 				isMultilineComment = false;
 				return;
 			} else {
-				console.error(`${rowIndex}:0 (zero indexed) is trying to end a multiline comment but there was none to end`);
+				console.warn(`${rowIndex}:0 (zero indexed) is trying to end a multiline comment but there was none to end`);
 			}
 		} else if (comment !== undefined && !comment.endsWith(']')) {
 			// starts a multiline comment
@@ -221,7 +221,7 @@ function parseInformLanguage(rawText) {
 		}
 
 		// = DECLARATIONS
-		match = line.match(/^(?:Version (.+) of )?(.+?) by (.+) begins here.$/);
+		match = line.match(/^(?:Version (.+) of )?(.+?) by (.+) begins here\.$/);
 		if (match !== null) {
 			[_, version, filename, author] = match;
 			nodes.push({
@@ -234,7 +234,7 @@ function parseInformLanguage(rawText) {
 			return;
 		}
 
-		match = line.match(/^(.+) ends here.$/);
+		match = line.match(/^(.+) ends here\.$/);
 		if (match !== null) {
 			[_, filename] = match;
 			nodes.push({
@@ -245,7 +245,7 @@ function parseInformLanguage(rawText) {
 			return;
 		}
 
-		match = line.match(/^(.+) is a (.+).$/);
+		match = line.match(/^(.+) is a (.+)\.$/);
 		if (match !== null) {
 			[_, variableName, variableType] = match;
 			nodes.push({
@@ -257,7 +257,7 @@ function parseInformLanguage(rawText) {
 			return;
 		}
 
-		match = line.match(/^(.+) is usually (.+).$/);
+		match = line.match(/^(.+) is usually (.+)\.$/);
 		if (match !== null) {
 			[_, variableName, variableValue] = match;
 			nodes.push({
@@ -269,7 +269,7 @@ function parseInformLanguage(rawText) {
 			return;
 		}
 
-		match = line.match(/^(.+) of (.+) is (.+).$/);
+		match = line.match(/^(.+) of (.+) is (.+)\.$/);
 		if (match !== null) {
 			[_, propertyName, variableName, variableValue] = match;
 			nodes.push({
@@ -282,7 +282,7 @@ function parseInformLanguage(rawText) {
 			return;
 		}
 
-		match = line.match(/^Section (.+) - (.+).$/);
+		match = line.match(/^Section (.+) - (.+)\.$/);
 		if (match !== null) {
 			[_, sectionName, sectionValue] = match;
 			nodes.push({
@@ -517,7 +517,7 @@ export function provideLinter() {
 			}
 
 			const lints = [];
-			const lines = text.split('\r\n');
+			const lines = text.split('\n').map(e => e.replace(/\r$/, ''));
 
 			function makeLintFromNode(node, extraOptions) {
 				return makeLintOnLine(node.rowIndex, {
@@ -569,6 +569,16 @@ export function provideLinter() {
 
 			// = REGULAR LINES
 
+			if (text.match(/[^\r]\n/g) !== null) {
+				lints.push({
+					...makeLintOnLine(0, {
+						apply: () => textEditor.setText(text.replace(/\r\n/g, '\n').replace(/\n/g, '\r\n')),
+					}),
+					severity: 'error',
+					excerpt: `Your file is using only LF (line-feeds) for new lines instead of CRLF (carriage-return line-feed)! Configure your text editor to use CRLF instead of LF!'`,
+				});
+			}
+
 			if (fileName.toLowerCase().includes(' for fs')) {
 				const proposedFileName = fileName.substr(0, fileName.length - 7);
 				lints.push({
@@ -581,42 +591,45 @@ export function provideLinter() {
 				});
 			}
 
-			const firstNode = parsedNodes[0];
-			if (firstNode.type === 'start declaration') {
-				if (firstNode.filename !== fileName || firstNode.author !== folderName) {
+			if (filePath.toLowerCase().includes('github')) {
+				const firstNode = parsedNodes[0];
+				if (firstNode.type === 'start declaration') {
+					if (firstNode.filename !== fileName || firstNode.author !== folderName) {
+						lints.push({
+							...makeLintFromNode(firstNode, {replaceWith: `${fileName} by ${folderName} begins here.`}),
+							severity: 'error',
+							excerpt: `Your first line should be '${fileName} by ${folderName} begins here.'`,
+						});
+					}
+				} else {
 					lints.push({
-						...makeLintFromNode(firstNode, {replaceWith: `${fileName} by ${folderName} begins here.`}),
+						...makeLintOnLine(0, {
+							apply: () => textEditor.setText(`${fileName} by ${folderName} begins here.\r\n\r\n${text}`),
+						}),
 						severity: 'error',
 						excerpt: `Your first line should be '${fileName} by ${folderName} begins here.'`,
 					});
 				}
-			} else {
-				lints.push({
-					...makeLintOnLine(0, {
-						apply: () => textEditor.setText(`${fileName} by ${folderName} begins here.\r\n\r\n${text}`),
-					}),
-					severity: 'error',
-					excerpt: `Your first line should be '${fileName} by ${folderName} begins here.'`,
-				});
-			}
 
-			const lastNode = parsedNodes[parsedNodes.length-1];
-			if (lastNode.type === 'end declaration') {
-				if (lastNode.filename !== fileName) {
+				const lastNode = parsedNodes[parsedNodes.length-1];
+				console.log(lastNode);
+				if (lastNode.type === 'end declaration') {
+					if (lastNode.filename !== fileName) {
+						lints.push({
+							...makeLintFromNode(lastNode, {replaceWith: `${fileName} ends here.`}),
+							severity: 'error',
+							excerpt: `Your last line should be '${fileName} ends here.'`,
+						});
+					}
+				} else {
 					lints.push({
-						...makeLintFromNode(lastNode, {replaceWith: `${fileName} ends here.`}),
+						...makeLintOnLine(-1, {
+							apply: () => textEditor.setText(`${text}\r\n\r\n${fileName} ends here.`),
+						}),
 						severity: 'error',
 						excerpt: `Your last line should be '${fileName} ends here.'`,
 					});
 				}
-			} else {
-				lints.push({
-					...makeLintOnLine(-1, {
-						apply: () => textEditor.setText(`${text}\r\n\r\n${fileName} ends here.`),
-					}),
-					severity: 'error',
-					excerpt: `Your last line should be '${fileName} ends here.'`,
-				});
 			}
 
 			for (let i = 0; i < lines.length; i++) {
@@ -693,8 +706,8 @@ export function provideLinter() {
 				const line = rawLine.trim();
 				const lineStartIndex = rawLine.match(/^\s*/)[0].length;
 
-				const whitespaceAtEndOfLine = rawLine.match(/\s*$/);
-				if (whitespaceAtEndOfLine[0].length > 0) {
+				const whitespaceAtEndOfLine = rawLine.match(/\s+$/);
+				if (whitespaceAtEndOfLine !== null) {
 					lints.push({
 						severity: 'error',
 						location: {
