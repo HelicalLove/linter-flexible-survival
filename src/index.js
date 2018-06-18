@@ -335,6 +335,7 @@ function parseInformLanguage(rawText) {
 				...node,
 				type: 'say action',
 				speech,
+				speechIndex: node.columnIndex + 5,
 			});
 			return;
 		}
@@ -455,6 +456,22 @@ function parseInformLanguage(rawText) {
 	return nodes;
 }
 
+String.prototype.forEachMatch = function(regex, lambda) {
+	if (!regex.global) {
+		return lambda(this.match(regex));
+	} else {
+		let match = null;
+
+		while (true) {
+			match = regex.exec(this.toString());
+			if (match === null) {
+				return;
+			}
+			lambda(match);
+		}
+	}
+}
+
 export function activate() {
 }
 
@@ -542,6 +559,8 @@ export function provideLinter() {
 				};
 			}
 
+			// = REGULAR LINES
+
 			if (fileName.toLowerCase().includes(' for fs')) {
 				const proposedFileName = fileName.substr(0, fileName.length - 7);
 				lints.push({
@@ -600,54 +619,53 @@ export function provideLinter() {
 						(spaces) => spaces.replace(/ ( |\t)/g, '\t'),
 					);
 					lints.push({
-						severity: 'error',
-						location: {
-							file: filePath,
-							position: [[i, 0], [i, indentationMatch[0].length]],
-						},
-						excerpt: `You are starting some of your lines with spaces instead of tabs. You MUST use tabs for Inform. Configure your text editor to use tabs instead of spaces.`,
-						solutions: [{
-							position: [[i, 0], [i, indentationMatch[0].length]],
+						...makeLintOnLine(i, {
+							fromIndex: 0,
+							toIndex: indentationMatch[0].length,
 							apply: () => textEditor.setText(fixedText),
-						}],
+						}),
+						severity: 'error',
+						excerpt: `You are starting some of your lines with spaces instead of tabs. You MUST use tabs for Inform. Configure your text editor to use tabs instead of spaces.`,
 					});
 				} else {
 					const oddIndentationMatch = lines[i].match(/^\t* [^ ]/);
 					if (oddIndentationMatch !== null) {
 						lints.push({
+							...makeLintOnLine(i, {
+								fromIndex: 0,
+								toIndex: indentationMatch[0].length,
+							}),
 							severity: 'error',
-							location: {
-								file: filePath,
-								position: [[i, 0], [i, oddIndentationMatch[0].length]],
-							},
 							excerpt: `You are starting some of your lines with spaces instead of tabs. You MUST use tabs for Inform. Configure your text editor to use tabs instead of spaces. I cannot autofix this one because there are an ODD number of spaces, which makes it ambiguous which direction it should go.`,
 						});
 					}
 				}
 			}
 
+			parsedNodes.forEach(node => {
+				switch (node.type) {
+					case 'say action':
+						for (const britishWord in BRITISH_TO_AMERICAN) {
+							const indexOfBritishInvasion = node.speech.indexOf(britishWord);
+							if (indexOfBritishInvasion !== -1) {
+								const americanWord = BRITISH_TO_AMERICAN[britishWord];
+								lints.push({
+									...makeLintOnLine(node.rowIndex, {
+										fromIndex: node.speechIndex + indexOfBritishInvasion,
+										toIndex: node.speechIndex + indexOfBritishInvasion + britishWord.length,
+										replaceWith: americanWord,
+									}),
+									severity: 'warning',
+									excerpt: `Prefer the American spelling '${americanWord}' instead of British '${britishWord}'`,
+								});
+							}
+						}
+				}
+			});
+
 			lines.forEach((rawLine, lineIndex) => {
 				const line = rawLine.trim();
 				const lineStartIndex = rawLine.match(/^\s*/)[0].length;
-
-				for (const britishWord in BRITISH_TO_AMERICAN) {
-					const indexOfBritishInvasion = rawLine.indexOf(britishWord);
-					if (indexOfBritishInvasion !== -1) {
-						const americanWord = BRITISH_TO_AMERICAN[britishWord];
-						lints.push({
-							severity: 'warning',
-							location: {
-								file: filePath,
-								position: [[lineIndex, indexOfBritishInvasion], [lineIndex, indexOfBritishInvasion + britishWord.length]],
-							},
-							excerpt: `Prefer the American spelling '${americanWord}' instead of British '${britishWord}'`,
-							solutions: [{
-								position: [[lineIndex, indexOfBritishInvasion], [lineIndex, indexOfBritishInvasion + britishWord.length]],
-								replaceWith: americanWord,
-							}],
-						});
-					}
-				}
 
 				const whitespaceAtEndOfLine = rawLine.match(/\s*$/);
 				if (whitespaceAtEndOfLine[0].length > 0) {

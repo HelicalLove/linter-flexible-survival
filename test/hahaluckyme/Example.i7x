@@ -3,7 +3,7 @@ Money is a number that varies.
 Section 1 - The first section
 
 to say foo:
-  if true:
+	if true:
 		say "     Smiling, I said hello."
 		say " What happened?";
 	otherwise:
@@ -11,6 +11,7 @@ to say foo:
 		say"oh no";
 		Say"oh no";
 		Say "oh no";
+		 say "Odd line";
 
 						say " What happened?";
 						say "  What happened?";
