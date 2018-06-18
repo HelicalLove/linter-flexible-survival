@@ -612,7 +612,6 @@ export function provideLinter() {
 				}
 
 				const lastNode = parsedNodes[parsedNodes.length-1];
-				console.log(lastNode);
 				if (lastNode.type === 'end declaration') {
 					if (lastNode.filename !== fileName) {
 						lints.push({
