@@ -97,6 +97,7 @@ const BRITISH_TO_AMERICAN = {
 
 // General coding styles that you should not use
 const CODING_STYLE_ERROR_SUPER_SUBSTITUTION = [
+	[/[\ufeff]/, '"', `You have an invisible zero-width character here. Please delete it.`],
 	[/[“”]/, '"', `Don't use Smart Quotes! Change the settings in applications like Word and LibreOffice to use regular quotes.`],
 	[/[‘’]/, '\'', `Don't use Smart Quotes! Change the settings in applications like Word and LibreOffice to use regular quotes.`],
 	[/[⋯…]/, '...', `Don't use Smart Ellipses! Change the settings in applications like Word and LibreOffice to use regular ellipses.`],
@@ -186,7 +187,7 @@ function parseInformLanguage(rawText) {
 			return;
 		}
 
-		[_, tabs, line, comment] = match;
+		[_fullLine, tabs, line, comment] = match;
 
 		if (line.match(/^\[.*\]$/) !== null) {
 			// just a single line comment
@@ -227,7 +228,7 @@ function parseInformLanguage(rawText) {
 			nodes.push({
 				...node,
 				type: 'start declaration',
-				version,
+				...(version === undefined ? {} : {version}),
 				filename,
 				author,
 			});
@@ -262,7 +263,7 @@ function parseInformLanguage(rawText) {
 			[_, variableName, variableValue] = match;
 			nodes.push({
 				...node,
-				type: 'variable usually declaration',
+				type: 'variable initialization',
 				variableName,
 				variableValue,
 			});
