@@ -833,7 +833,7 @@ export function provideLinter() {
 				match = line.match(/^say "(.+)";$/);
 				if (match !== null) {
 					[_, speech] = match;
-					if (speech.includes('[link]') && !(
+					if (speech.trim().startsWith('[link]') && !(
 						speech.endsWith('?') ||
 						speech.endsWith('!') ||
 						speech.endsWith('.') ||
