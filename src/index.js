@@ -824,10 +824,30 @@ export function provideLinter() {
 						},
 						solutions: [{
 							position: [[lineIndex, lineStartIndex + 5], [lineIndex, lineStartIndex + 6]],
-							replaceWith: '		 ',
+							replaceWith: '     ',
 						}],
 						excerpt: `Paragraph indentation should use 5 spaces instead of tabs.`,
 					});
+				}
+
+				match = line.match(/^say "(.+)";$/);
+				if (match !== null) {
+					[_, speech] = match;
+					if (speech.includes('[link]') && !(
+						speech.endsWith('?') ||
+						speech.endsWith('!') ||
+						speech.endsWith('.') ||
+						speech.endsWith('[line break]')
+					)) {
+						lints.push({
+							severity: 'error',
+							location: {
+								file: filePath,
+								position: [[lineIndex, lineStartIndex + 5], [lineIndex, lineStartIndex + 5 + speech.length]],
+							},
+							excerpt: `All links must end in a punctionation character or [line break].`,
+						});
+					}
 				}
 
 				// cant parse special brackets
@@ -838,30 +858,30 @@ export function provideLinter() {
 					const startSpeechIndex = line.substr(5).search(/[^\s]/) + startQuoteIndex + 1;
 					const speechSubstr = rawLine.substr(startSpeechIndex, endQuoteIndex - startSpeechIndex);
 
-					// attempt to extract sentences from speech
-					const sentences = [];
-					let sentenceRegex = /(\.\.\.|[.?!])'? ?/g;
-					let speechRegexMatch = null;
-					let lastSpeechRegexMatchIndex = startSpeechIndex;
-					while ((speechRegexMatch = sentenceRegex.exec(speechSubstr)) !== null) {
-						 const sentence = rawLine.substr(lastSpeechRegexMatchIndex, startSpeechIndex + speechRegexMatch.index + speechRegexMatch[0].length - lastSpeechRegexMatchIndex).trim();
-						 const words = sentence.toLowerCase().replace(/['.,!?-]/g, '').replace(/\s\s+/g, ' ').split(' ').map(e => e.trim()).filter(e => e.length > 0);
-						 sentences.push({
-							 sentence,
-							 words,
-							 index: lastSpeechRegexMatchIndex,
-						 })
-						 lastSpeechRegexMatchIndex = startSpeechIndex + speechRegexMatch.index + speechRegexMatch[0].length;
-					}
-					if (lastSpeechRegexMatchIndex !== startSpeechIndex + speechSubstr.length) {
-						const sentence = rawLine.substr(lastSpeechRegexMatchIndex, endQuoteIndex - lastSpeechRegexMatchIndex).trim();
-						const words = sentence.toLowerCase().replace(/['.,!?-]/g, '').replace(/\s\s+/g, ' ').split(' ').map(e => e.trim()).filter(e => e.length > 0);
-						sentences.push({
-							sentence,
-							words,
-							index: lastSpeechRegexMatchIndex,
-						})
-					}
+					// // attempt to extract sentences from speech
+					// const sentences = [];
+					// let sentenceRegex = /(\.\.\.|[.?!])'? ?/g;
+					// let speechRegexMatch = null;
+					// let lastSpeechRegexMatchIndex = startSpeechIndex;
+					// while ((speechRegexMatch = sentenceRegex.exec(speechSubstr)) !== null) {
+					// 	 const sentence = rawLine.substr(lastSpeechRegexMatchIndex, startSpeechIndex + speechRegexMatch.index + speechRegexMatch[0].length - lastSpeechRegexMatchIndex).trim();
+					// 	 const words = sentence.toLowerCase().replace(/['.,!?-]/g, '').replace(/\s\s+/g, ' ').split(' ').map(e => e.trim()).filter(e => e.length > 0);
+					// 	 sentences.push({
+					// 		 sentence,
+					// 		 words,
+					// 		 index: lastSpeechRegexMatchIndex,
+					// 	 });
+					// 	 lastSpeechRegexMatchIndex = startSpeechIndex + speechRegexMatch.index + speechRegexMatch[0].length;
+					// }
+					// if (lastSpeechRegexMatchIndex !== startSpeechIndex + speechSubstr.length) {
+					// 	const sentence = rawLine.substr(lastSpeechRegexMatchIndex, endQuoteIndex - lastSpeechRegexMatchIndex).trim();
+					// 	const words = sentence.toLowerCase().replace(/['.,!?-]/g, '').replace(/\s\s+/g, ' ').split(' ').map(e => e.trim()).filter(e => e.length > 0);
+					// 	sentences.push({
+					// 		sentence,
+					// 		words,
+					// 		index: lastSpeechRegexMatchIndex,
+					// 	});
+					// }
 
 					// for (let i = 2; i < sentences.length; i++) {
 					// 	// cant parse special brackets
