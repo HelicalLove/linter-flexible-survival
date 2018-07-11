@@ -180,7 +180,7 @@ function parseInformLanguage(rawText) {
 	const lines = rawText.split('\n');
 	let isMultilineComment = false;
 	lines.forEach((rawLine, rowIndex) => {
-		let match = rawLine.match(/^(\t*)(.*?)( *\[[^;.:\r]*)?\r?$/);
+		let match = rawLine.match(/^(\t*)(.*?)( *\[[^;.:"\r]*)?\r?$/);
 
 		if (match === null) {
 			console.error(`${rowIndex}:0 (zero indexed) is not parsed correctly: ${rawLine}`);
