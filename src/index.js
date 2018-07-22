@@ -830,26 +830,6 @@ export function provideLinter() {
 					});
 				}
 
-				match = line.match(/^say "(.+)";$/);
-				if (match !== null) {
-					[_, speech] = match;
-					if (speech.trim().startsWith('[link]') && !(
-						speech.endsWith('?') ||
-						speech.endsWith('!') ||
-						speech.endsWith('.') ||
-						speech.endsWith('[line break]')
-					)) {
-						lints.push({
-							severity: 'error',
-							location: {
-								file: filePath,
-								position: [[lineIndex, lineStartIndex + 5], [lineIndex, lineStartIndex + 5 + speech.length]],
-							},
-							excerpt: `All links must end in a punctionation character or [line break].`,
-						});
-					}
-				}
-
 				// cant parse special brackets
 				if (line.startsWith('say "') && line.indexOf('[') === -1) {
 					const startQuoteIndex = rawLine.indexOf('"');
