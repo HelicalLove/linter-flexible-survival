@@ -1011,7 +1011,7 @@ export function provideLinter() {
 					}
 				}
 
-				const changeEntryMatch = line.match(/^now (face|body|skin|ass|cock)(change)? entry is "(.+?)\.";/);
+				const changeEntryMatch = rawLine.match(/^now (face|body|skin|ass|cock)(change)? entry is "(.+?)\.";/);
 				if (changeEntryMatch !== null) {
 					lints.push({
 						severity: 'warning',
@@ -1027,7 +1027,7 @@ export function provideLinter() {
 					});
 				}
 
-				const entryMatch = line.match(/^now tail entry is "(.+?)[^\.]";/);
+				const entryMatch = rawLine.match(/^now tail entry is "(.+?)[^\.]";/);
 				if (entryMatch !== null) {
 					lints.push({
 						severity: 'warning',
@@ -1043,7 +1043,7 @@ export function provideLinter() {
 					});
 				}
 
-				const spaceAfterOperatorMatch = line.match(/(<=|>=|==)[^ <=>]/);
+				const spaceAfterOperatorMatch = rawLine.match(/(<=|>=|==)[^ <=>]/);
 				if (spaceAfterOperatorMatch !== null) {
 					lints.push({
 						severity: 'error',
@@ -1056,6 +1056,18 @@ export function provideLinter() {
 							position: [[lineIndex, spaceAfterOperatorMatch.index + spaceAfterOperatorMatch[0].length - 1], [lineIndex, spaceAfterOperatorMatch.index + spaceAfterOperatorMatch[0].length - 1]],
 							replaceWith: ' ',
 						}],
+					});
+				}
+
+				const isDuplicateMatch = rawLine.match(/(is <|is >)/);
+				if (isDuplicateMatch !== null) {
+					lints.push({
+						severity: 'error',
+						location: {
+							file: filePath,
+							position: [[lineIndex, isDuplicateMatch.index], [lineIndex, isDuplicateMatch.index + isDuplicateMatch[0].length - 1]],
+						},
+						excerpt: `Don't use 'is' before < or > operators.`,
 					});
 				}
 
