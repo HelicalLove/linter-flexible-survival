@@ -654,7 +654,7 @@ export function provideLinter() {
 						lints.push({
 							...makeLintOnLine(i, {
 								fromIndex: 0,
-								toIndex: indentationMatch[0].length,
+								toIndex: oddIndentationMatch[0].length,
 							}),
 							severity: 'error',
 							excerpt: `You are starting some of your lines with spaces instead of tabs. You MUST use tabs for Inform. Configure your text editor to use tabs instead of spaces. I cannot autofix this one because there are an ODD number of spaces, which makes it ambiguous which direction it should go.`,
