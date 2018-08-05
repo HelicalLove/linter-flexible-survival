@@ -570,16 +570,6 @@ export function provideLinter() {
 
 			// = REGULAR LINES
 
-			if (text.match(/[^\r]\n/g) !== null) {
-				lints.push({
-					...makeLintOnLine(0, {
-						apply: () => textEditor.setText(text.replace(/\r\n/g, '\n').replace(/\n/g, '\r\n')),
-					}),
-					severity: 'error',
-					excerpt: `Your file is using only LF (line-feeds) for new lines instead of CRLF (carriage-return line-feed)! Configure your text editor to use CRLF instead of LF!'`,
-				});
-			}
-
 			if (fileName.toLowerCase().includes(' for fs')) {
 				const proposedFileName = fileName.substr(0, fileName.length - 7);
 				lints.push({
