@@ -1049,7 +1049,7 @@ export function provideLinter() {
 					});
 				}
 
-				const isDuplicateMatch = rawLine.match(/(is <|is >)/);
+				const isDuplicateMatch = rawLine.match(/\b(is <|is >)/);
 				if (isDuplicateMatch !== null) {
 					lints.push({
 						severity: 'error',

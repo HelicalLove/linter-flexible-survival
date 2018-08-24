@@ -44,6 +44,12 @@ if cocks of player = 0:
 if cunts of player = 0:
 	say "Oh yessss";
 
+if HP of Chris > 0:
+	pass;
+
+if HP is > 0:
+	pass;
+
 if calcnumber is:
 	-- 1:
 			now PronounChoice of player is "Auto";
