@@ -148,6 +148,9 @@ const FUNCTION_SUBSTITUTIONS = {
 
 const FUNCTION_REGEX_SUBSTITUTIONS = [
 	[/if (cocks|cunts) of player =/, 'if $1 of player is'],
+	[/remove (.+) from play/, 'now $1 is nowhere'],
+	[/now (.+) is in dark basement/, 'now $1 is nowhere'],
+	[/move (.+) to dark basement/, 'now $1 is nowhere'],
 ];
 
 const NON_INTERESTING_WORDS = [

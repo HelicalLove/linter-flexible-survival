@@ -81,4 +81,8 @@ say "     [WaitLineBreak]";
 
 say "[if cunts of x > 0 and cocks of x is 0]asdf[end if]";
 
+if true:
+	remove poop from play;
+	now poop is in dark basement;
+
 Example ends here.
