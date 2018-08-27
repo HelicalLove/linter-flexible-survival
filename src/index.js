@@ -225,7 +225,7 @@ function parseInformLanguage(rawText) {
 		}
 
 		// = DECLARATIONS
-		match = line.match(/^(?:Version (.+) of )?(.+?) by (.+) begins here\.$/);
+		match = line.match(/^(?:Version (.+?) of )?(.+?) by (.+) begins here\.$/);
 		if (match !== null) {
 			[_, version, filename, author] = match;
 			nodes.push({
